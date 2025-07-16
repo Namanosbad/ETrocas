@@ -1,0 +1,6 @@
+dotnet ef migrations add InitialCreate --project ETrocas.Database --startup-project ETrocas.Api.Internal
+
+dotnet ef database update --project ETrocas.Database --startup-project ETrocas.Api.Internal
+
+dotnet ef migrations remove --project ETrocas.Database --startup-project ETrocas.Api.Internal
+
