@@ -1,5 +1,10 @@
-﻿using ETrocas.Database;
+﻿using ETrocas.Application.Interfaces;
+using ETrocas.Application.Services.v1;
+using ETrocas.Database;
+using ETrocas.Database.Repository;
+using ETrocas.Domain.Interfaces;
 using ETrocas.Shared.Configuration;
+using ETrocas.Shared.Interfaces;
 using ETrocas.Shared.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +22,7 @@ namespace ETrocas.Ioc
         {
             services.AddDbContext(configuration);
             services.AddAuthentication(configuration);
-
+            services.AddApplicationServices();
             return services;
         }
 
@@ -57,6 +62,14 @@ namespace ETrocas.Ioc
             });
 
             services.AddTransient<ITokenService, TokenService>();
+
+            return services;
+        }
+        private static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        {
+            services.AddTransient<IUsuarioRepository, UsuarioRepository>();
+            services.AddTransient<IUsuarioService, UsuarioService>();
+
             return services;
         }
     }

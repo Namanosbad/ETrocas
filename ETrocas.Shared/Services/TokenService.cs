@@ -1,6 +1,6 @@
 ﻿using ETrocas.Domain.Entities;
-using ETrocas.Ioc;
 using ETrocas.Shared.Configuration;
+using ETrocas.Shared.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

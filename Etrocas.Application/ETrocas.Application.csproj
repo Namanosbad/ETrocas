@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Requests\" />
+    <ProjectReference Include="..\ETrocas.Domain\ETrocas.Domain.csproj" />
+    <ProjectReference Include="..\ETrocas.Shared\ETrocas.Shared.csproj" />
   </ItemGroup>
 
 </Project>
