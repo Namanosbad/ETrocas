@@ -1,6 +1,6 @@
 ﻿using ETrocas.Domain.Entities;
 
-namespace ETrocas.Ioc;
+namespace ETrocas.Shared.Interfaces;
 
 public interface ITokenService
 {
