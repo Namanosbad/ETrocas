@@ -2,7 +2,7 @@
 using ETrocas.Domain.Interfaces;
 
 namespace ETrocas.Domain.Entities;
-
+  
 public class Proposta : IEntity
 {
     public Guid Id { get; set; }

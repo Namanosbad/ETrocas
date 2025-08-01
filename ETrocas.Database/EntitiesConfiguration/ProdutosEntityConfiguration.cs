@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+//como vai ser configurado as entidades do banco de dados. 
 namespace ETrocas.Database.EntitiesConfiguration
 {
     public class ProdutosEntityConfiguration : IEntityTypeConfiguration<Produtos>
