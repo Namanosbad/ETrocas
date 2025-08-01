@@ -1,4 +1,5 @@
-﻿using ETrocas.Application.Interfaces;
+﻿using Asp.Versioning;
+using ETrocas.Application.Interfaces;
 using ETrocas.Application.Services.v1;
 using ETrocas.Database;
 using ETrocas.Database.Repository;
@@ -14,22 +15,27 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+//Injeção de dependencia.
 namespace ETrocas.Ioc
 {
     public static class ServiceCollectionExtensions
     {
+        //
         public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext(configuration);
             services.AddAuthentication(configuration);
             services.AddApplicationServices();
+            services.AddApiVersioning(configuration);
             return services;
         }
 
         private static IServiceCollection AddDbContext(this IServiceCollection services, IConfiguration configuration)
         {
+            //
             services.Configure<DbConfig>(config => configuration.GetRequiredSection(nameof(DbConfig)).Bind(config));
 
+            //options 
             services.AddDbContext<ETrocasDbContext>((serviceProvider, options) =>
                 {
                     var config = serviceProvider.GetRequiredService<IOptions<DbConfig>>().Value;
@@ -39,7 +45,7 @@ namespace ETrocas.Ioc
 
             return services;
         }
-
+        //
         private static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<TokenConfig>(config => configuration.GetRequiredSection(nameof(TokenConfig)).Bind(config));
@@ -55,7 +61,7 @@ namespace ETrocas.Ioc
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    ValidateAudience = true,
+                    ValidateAudience = false,
                     IssuerSigningKey = new SymmetricSecurityKey(asciiKey),
                     ValidateIssuer = false
                 };
@@ -65,11 +71,33 @@ namespace ETrocas.Ioc
 
             return services;
         }
+
         private static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             services.AddTransient<IUsuarioRepository, UsuarioRepository>();
             services.AddTransient<IUsuarioService, UsuarioService>();
+            services.AddTransient<IProdutoRepository, ProdutoRepository>();
+            services.AddTransient<IProdutoService, ProdutoService>();
 
+            return services;
+        }
+
+        public static IServiceCollection AddApiVersioning(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddApiVersioning(o=>
+            {
+                o.DefaultApiVersion = new ApiVersion(1, 0);
+                o.AssumeDefaultVersionWhenUnspecified = true;
+                o.ReportApiVersions = true;
+                o.ApiVersionReader = ApiVersionReader.Combine(
+                                     new QueryStringApiVersionReader(),
+                                     new UrlSegmentApiVersionReader());
+
+            }).AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });
             return services;
         }
     }

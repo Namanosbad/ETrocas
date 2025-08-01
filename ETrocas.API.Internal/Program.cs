@@ -10,7 +10,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "JWTAuthAuthentication", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "ETrocas",
+        Description = "Sistema de trocas",
+        TermsOfService = new Uri("https://github.com/Namanosbad"),
+        Contact = new OpenApiContact 
+        {
+            Name = "Matheus Lima",
+            Email = "matheus.limamst@gmail.com",
+            Url = new Uri("https://www.linkedin.com/in/matheuslimamst/"),
+        }
+    });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
         Name = "Authorization",
@@ -36,7 +48,16 @@ builder.Services.AddSwaggerGen(c =>
                 });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
+});
+
 builder.Services.AddServices(builder.Configuration);
+
 
 var app = builder.Build();
 
@@ -44,14 +65,17 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ETrocas");
+    });
 }
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseCors("AllowAll");
 app.MapControllers();
 
 app.Run();

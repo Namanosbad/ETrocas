@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
+
 namespace ETrocas.Shared.Services
 {
     public class TokenService(IOptions<TokenConfig> config) : ITokenService
@@ -33,10 +34,11 @@ namespace ETrocas.Shared.Services
             return handler.WriteToken(token);
         }
 
-        private ClaimsIdentity GerarClaims(Usuario usuario) 
+        private ClaimsIdentity GerarClaims(Usuario usuario)  
         {
             var ci = new ClaimsIdentity();
 
+            ci.AddClaim(new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()));
             ci.AddClaim(new Claim(ClaimTypes.Name, usuario.Nome));
             ci.AddClaim(new Claim(ClaimTypes.Email, usuario.Email));
 
