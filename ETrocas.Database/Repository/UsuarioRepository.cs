@@ -23,7 +23,7 @@ namespace ETrocas.Database.Repository
             return usuario;
         }
 
-        public async Task<Usuario?> LoginUsuarioAsync(Usuario usuario)
+        public async Task<Usuario> LoginUsuarioAsync(Usuario usuario)
         {
             return await _context.Usuarios
                 .FirstOrDefaultAsync(u =>

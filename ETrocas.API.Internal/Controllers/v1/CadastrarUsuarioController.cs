@@ -30,7 +30,7 @@ namespace ETrocas.API.Internal.Controllers.v1
             var response = await _usuarioService.RegistrarUsuarioAsync(request);
             return Ok(response);
         }
-
+        
         //Rota(login) e metodo http (Post)
         [HttpPost("login")]
 

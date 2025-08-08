@@ -1,7 +1,6 @@
 ﻿using Asp.Versioning;
 using ETrocas.Application.Interfaces;
 using ETrocas.Application.Requests;
-using ETrocas.Application.Services.v1;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -21,13 +20,12 @@ namespace ETrocas.API.Internal.Controllers.v1
         private readonly IProdutoService _produtoService;
         public ProdutosController(IProdutoService produtoService)
         {
-           _produtoService = produtoService;
+            _produtoService = produtoService;
         }
 
         [Authorize]
         [HttpPost("CadastrarProduto")]
-   
-        public async Task<IActionResult> CadastrarProduto([FromBody]CadastrarProdutoRequest cadastrarProdutoRequest)
+        public async Task<IActionResult> CadastrarProduto([FromBody] CadastrarProdutoRequest cadastrarProdutoRequest)
         {
             var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -35,13 +33,32 @@ namespace ETrocas.API.Internal.Controllers.v1
                 return Unauthorized();
 
             var response = await _produtoService.CadastrarProdutoAsync(cadastrarProdutoRequest, usuarioGuid);
-
+         
             return Ok(response);
         }
 
         [Authorize]
-        [HttpPost("")]
+        [HttpGet("VerProduto/{id:guid}")]
+        public async Task<IActionResult> PuxarIdAsync(Guid id)
+        {
+            var produto = await _produtoService.GetByIdAsync(id);
+            return Ok(produto);
+        }
 
-        
+        [Authorize]
+        [HttpDelete("DeletarProduto")]
+        public async Task<IActionResult> DeletarProdutoAsync(Guid id)
+        {
+            await _produtoService.DeletarProdutoAsync(id);
+            return NoContent();
+        }
+
+ 
+        [HttpGet("VerTodosProdutos")]
+        public async Task<IActionResult> TodosProdutosAsync()
+        {
+            var produtos = await _produtoService.GetAllAsync();
+            return Ok(produtos);
+        }
     }
 }
