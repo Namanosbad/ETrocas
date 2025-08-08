@@ -17,7 +17,7 @@ namespace ETrocas.Database.Repository
         //como o banco vai lidar com o serviço/adicionar e salvar o produto
         public async Task<Produtos> CadastrarProdutoAsync(Produtos produtos)
         {
-            _context.AddAsync(produtos);
+            await _context.AddAsync(produtos);
             await _context.SaveChangesAsync(); 
             return produtos;
         }
