@@ -37,11 +37,26 @@ namespace ETrocas.API.Internal.Controllers.v1
             return Ok(response);
         }
 
+        [HttpGet("BuscarTodosProdutos")]
+        public async Task<IActionResult> TodosProdutosAsync()
+        {
+            var produtos = await _produtoService.GetAllAsync();
+            return Ok(produtos);
+        }
+
         [Authorize]
-        [HttpGet("VerProduto/{id:guid}")]
+        [HttpGet("BuscarProduto/{id:guid}")]
         public async Task<IActionResult> PuxarIdAsync(Guid id)
         {
             var produto = await _produtoService.GetByIdAsync(id);
+            return Ok(produto);
+        }
+
+        [Authorize]
+        [HttpPut("AtualizarProduto/{id:guid}")]
+        public async Task<IActionResult> AtualizarProdutoAsync(Guid id,[FromBody] AtualizarProdutoRequest updateRequest)
+        {
+            var produto = await _produtoService.UpdateAsync(id, updateRequest);
             return Ok(produto);
         }
 
@@ -51,14 +66,6 @@ namespace ETrocas.API.Internal.Controllers.v1
         {
             await _produtoService.DeletarProdutoAsync(id);
             return NoContent();
-        }
-
- 
-        [HttpGet("VerTodosProdutos")]
-        public async Task<IActionResult> TodosProdutosAsync()
-        {
-            var produtos = await _produtoService.GetAllAsync();
-            return Ok(produtos);
         }
     }
 }

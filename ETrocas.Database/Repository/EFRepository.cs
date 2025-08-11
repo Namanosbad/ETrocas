@@ -41,5 +41,12 @@ namespace ETrocas.Database.Repository
         {
           return await _dbSet.AnyAsync(e => e.Id == id);
         }
+
+        public async Task<T> UpdateAsync(T tentity)
+        {
+            _dbSet.Update(tentity);
+            await _eTrocasDb.SaveChangesAsync();
+            return tentity;
+        }
     }
 }

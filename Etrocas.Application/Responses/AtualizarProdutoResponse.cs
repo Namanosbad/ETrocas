@@ -1,8 +1,6 @@
-﻿using ETrocas.Domain.Interfaces;
+﻿namespace ETrocas.Application.Responses;
 
-namespace ETrocas.Domain.Entities;
-
-public class Produtos : IEntity
+public class AtualizarProdutoResponse
 {
     public Guid Id { get; set; }
     public string? Produto { get; set; }
@@ -10,9 +8,6 @@ public class Produtos : IEntity
     public decimal Valor { get; set; }
     public string? Descricao { get; set; }
     public bool Disponivel { get; set; }
-    public DateTime DataCadastro { get; set; } = DateTime.Now;
     public string? ImageUrl { get; set; }
-
     public Guid UsuarioId { get; set; }
-    public Usuario? Usuario { get; set; }
 }

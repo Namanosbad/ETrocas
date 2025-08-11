@@ -1,4 +1,4 @@
-﻿using ETrocas.Application.Interfaces;
+﻿ using ETrocas.Application.Interfaces;
 using ETrocas.Application.Requests;
 using ETrocas.Application.Responses;
 using ETrocas.Domain.Entities;
@@ -79,6 +79,36 @@ namespace ETrocas.Application.Services.v1
         {
             var produtos = await _repo.GetAllAsync();
             return produtos;
+        }
+
+        public async Task<AtualizarProdutoResponse> UpdateAsync(Guid id, AtualizarProdutoRequest updateRequest)
+        {
+            //1- encontrar pelo id.
+            var produto = await _repo.GetByIdAsync(id);
+
+            //2- request,
+            produto.Produto = updateRequest.Produto;
+            produto.Tipo = updateRequest.Tipo;
+            produto.Valor = updateRequest.Valor;
+            produto.Descricao = updateRequest.Descricao;
+            produto.Disponivel = updateRequest.Disponivel;
+            produto.ImageUrl = updateRequest.ImageUrl;
+
+            //faz o update
+            await _repo.UpdateAsync(produto);
+
+            //3-response,//4- retorno.
+            return new AtualizarProdutoResponse
+            {
+                Id = produto.Id,
+                Produto = produto.Produto,
+                Tipo = produto.Tipo,
+                Valor = produto.Valor,
+                Descricao = produto.Descricao,
+                Disponivel = produto.Disponivel,
+                ImageUrl = updateRequest.ImageUrl,
+                UsuarioId = produto.UsuarioId,
+            };
         }
     }
 }
