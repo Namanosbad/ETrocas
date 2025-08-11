@@ -10,4 +10,5 @@ public interface IProdutoService
     Task DeletarProdutoAsync(Guid id);
     Task<Produtos> GetByIdAsync(Guid id);
     Task<IEnumerable<Produtos>> GetAllAsync();
+    Task<AtualizarProdutoResponse> UpdateAsync(Guid id, AtualizarProdutoRequest updateRequest);
 }
