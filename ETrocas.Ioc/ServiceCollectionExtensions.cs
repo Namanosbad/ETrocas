@@ -78,7 +78,9 @@ namespace ETrocas.Ioc
             services.AddTransient<IUsuarioService, UsuarioService>();
             services.AddTransient<IProdutoRepository, ProdutoRepository>();
             services.AddTransient<IProdutoService, ProdutoService>();
+            services.AddScoped(typeof(IPropostaRepository), typeof(PropostaRepository));
             services.AddScoped(typeof(IRepository<>), typeof(EFRepository<>));
+         
 
             return services;
         }
