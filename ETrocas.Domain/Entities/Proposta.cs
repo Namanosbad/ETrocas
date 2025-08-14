@@ -6,9 +6,11 @@ namespace ETrocas.Domain.Entities;
 public class Proposta : IEntity
 {
     public Guid Id { get; set; }
-    public DateTime DataProposta { get; set; }
-    public DateTime DataResposta {  get; set; }
+    public DateTime DataProposta { get; set; } = DateTime.Now;
+    public DateTime? DataResposta {  get; set; }
     public EStatusProposta StatusProposta { get; set; } = EStatusProposta.Pendente;
+    public decimal ValorProposto { get; set; }
+    public string? Mensagem { get; set; }
 
     public Guid UsuarioPropostaId { get; set; }
     public Usuario? UsuarioProposta { get; set; }

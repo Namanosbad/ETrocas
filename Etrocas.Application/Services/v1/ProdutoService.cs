@@ -80,7 +80,8 @@ namespace ETrocas.Application.Services.v1
             var produtos = await _repo.GetAllAsync();
             return produtos;
         }
-
+        
+        //logica para atualizar produtos cadastrados.
         public async Task<AtualizarProdutoResponse> UpdateAsync(Guid id, AtualizarProdutoRequest updateRequest)
         {
             //1- encontrar pelo id.

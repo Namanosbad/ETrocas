@@ -24,6 +24,11 @@ namespace ETrocas.Database.EntitiesConfiguration
             builder.Property(p => p.StatusProposta)
                         .IsRequired();
 
+            builder.Property(p =>p.ValorProposto)
+                        .IsRequired();
+
+            builder.Property(p => p.Mensagem);
+
             builder.HasOne(p => p.ProdutoDesejado)
                          .WithMany()
                          .HasForeignKey(p => p.ProdutoDesejadoId)
