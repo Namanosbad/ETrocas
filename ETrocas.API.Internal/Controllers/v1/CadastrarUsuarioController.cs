@@ -27,10 +27,17 @@ namespace ETrocas.API.Internal.Controllers.v1
             // usuario fizer isso no request passado no Body desse metodo, ele vai salvar com as informações do usuario e retornar o response.
             //conforme definido na classe response.
             //essa linha é equivalente a RegistrarUsuarioResponse response = await _usuarioService.RegistrarUsuarioAsync(request); 
-            var response = await _usuarioService.RegistrarUsuarioAsync(request);
-            return Ok(response);
+            try
+            {
+                var response = await _usuarioService.RegistrarUsuarioAsync(request);
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-        
+
         //Rota(login) e metodo http (Post)
         [HttpPost("login")]
 
@@ -40,8 +47,19 @@ namespace ETrocas.API.Internal.Controllers.v1
             //cria a variavel response, que contem a logica do login no service quando recebe,
             //o loginRequest passado pelo usuario e retorna OK e resposta.
             //aqui é o mesmo que usar LoginUsuarioResponse response = await _usuarioService.LoginUsuarioAsync(loginRequest); mas é mais facil usar a variavel
-            var response = await _usuarioService.LoginUsuarioAsync(loginRequest);
-            return Ok(response);
+            try
+            {
+                var response = await _usuarioService.LoginUsuarioAsync(loginRequest);
+                return Ok(response);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

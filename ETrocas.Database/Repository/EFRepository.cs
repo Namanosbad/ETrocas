@@ -1,10 +1,9 @@
-﻿using ETrocas.Domain.Entities;
-using ETrocas.Domain.Interfaces;
+﻿using ETrocas.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Collections;
 //logica de como o banco vai acessar e manipular os dados.
 namespace ETrocas.Database.Repository
 {
+    //repositorio generico serve para ser usado por varias entidades como produto/proposta e usuario.
     public class EFRepository<T> : IRepository<T> where T : class, IEntity
     {
         //injeção de deprencia 

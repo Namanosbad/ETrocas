@@ -5,7 +5,7 @@ using ETrocas.Domain.Entities;
 using ETrocas.Domain.Interfaces;
 using ETrocas.Shared.Interfaces;
 
-        //Service contém as regras de negócio, Serve como ponte entre o controller e o repositório
+//Service contém as regras de negócio, Serve como ponte entre o controller e o repositório
 namespace ETrocas.Application.Services.v1
 {
     public class UsuarioService : IUsuarioService
@@ -23,6 +23,14 @@ namespace ETrocas.Application.Services.v1
 
         public async Task<RegistrarUsuarioResponse> RegistrarUsuarioAsync(RegistrarUsuarioRequest request)
         {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            if (string.IsNullOrWhiteSpace(request.Nome) ||
+                string.IsNullOrWhiteSpace(request.Email) ||
+                string.IsNullOrWhiteSpace(request.SenhaHash))
+                throw new ArgumentException("Nome, email e senha são obrigatórios.");
+
             //cria um novo objeto Usuario. Esse objeto representa um novo usuário que será registrado no sistema.
             var CadastroUsuario = new Usuario
             {
@@ -48,6 +56,12 @@ namespace ETrocas.Application.Services.v1
 
         public async Task<LoginUsuarioResponse> LoginUsuarioAsync(LoginUsuarioRequest request)
         {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.SenhaHash))
+                throw new ArgumentException("Email e senha são obrigatórios.");
+
             //criando o novo objeto. Esse objeto representa o usuario que vai logar no sistema
             var usuarioLogin = new Usuario
             {
@@ -56,6 +70,9 @@ namespace ETrocas.Application.Services.v1
             };
             //salva o objeto no banco.
             var usuario = await _usuarioRepository.LoginUsuarioAsync(usuarioLogin);
+
+            if (usuario == null)
+                throw new UnauthorizedAccessException("Credenciais inválidas.");
 
             var token = _tokenService.Gerar(usuario);
             //o que aparece pro cliente/quem usar 

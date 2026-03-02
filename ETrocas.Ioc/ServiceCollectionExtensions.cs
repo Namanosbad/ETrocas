@@ -18,6 +18,7 @@ using System.Text;
 //Injeção de dependencia.
 namespace ETrocas.Ioc
 {
+        //
     public static class ServiceCollectionExtensions
     {
         //
