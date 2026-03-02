@@ -32,9 +32,15 @@ namespace ETrocas.API.Internal.Controllers.v1
             if (string.IsNullOrEmpty(usuarioId) || !Guid.TryParse(usuarioId, out var usuarioGuid))
                 return Unauthorized();
 
-            var response = await _produtoService.CadastrarProdutoAsync(cadastrarProdutoRequest, usuarioGuid);
-         
-            return Ok(response);
+            try
+            {
+                var response = await _produtoService.CadastrarProdutoAsync(cadastrarProdutoRequest, usuarioGuid);
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("BuscarTodosProdutos")]
@@ -48,24 +54,49 @@ namespace ETrocas.API.Internal.Controllers.v1
         [HttpGet("BuscarProduto/{id:guid}")]
         public async Task<IActionResult> PuxarIdAsync(Guid id)
         {
-            var produto = await _produtoService.GetByIdAsync(id);
-            return Ok(produto);
+            try
+            {
+                var produto = await _produtoService.GetByIdAsync(id);
+                return Ok(produto);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [Authorize]
         [HttpPut("AtualizarProduto/{id:guid}")]
         public async Task<IActionResult> AtualizarProdutoAsync(Guid id,[FromBody] AtualizarProdutoRequest updateRequest)
         {
-            var produto = await _produtoService.UpdateAsync(id, updateRequest);
-            return Ok(produto);
+            try
+            {
+                var produto = await _produtoService.UpdateAsync(id, updateRequest);
+                return Ok(produto);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [Authorize]
         [HttpDelete("DeletarProduto")]
         public async Task<IActionResult> DeletarProdutoAsync(Guid id)
         {
-            await _produtoService.DeletarProdutoAsync(id);
-            return NoContent();
+            try
+            {
+                await _produtoService.DeletarProdutoAsync(id);
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

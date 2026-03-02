@@ -22,6 +22,13 @@ namespace ETrocas.Application.Services.v1
         //logica do cadastro de produto.
         public async Task<CadastrarProdutoResponse> CadastrarProdutoAsync(CadastrarProdutoRequest cadastrarProdutoRequest, Guid usuarioGuid)
         {
+            if (cadastrarProdutoRequest == null)
+                throw new ArgumentNullException(nameof(cadastrarProdutoRequest));
+
+            if (string.IsNullOrWhiteSpace(cadastrarProdutoRequest.Produto) ||
+                string.IsNullOrWhiteSpace(cadastrarProdutoRequest.Tipo))
+                throw new ArgumentException("Produto e tipo são obrigatórios.");
+
             //Aqui eu cadastro o produto a linha 23 é o objeto de entrada que representa o request.
             var CadastrarProduto = new Produtos
             {
@@ -84,8 +91,14 @@ namespace ETrocas.Application.Services.v1
         //logica para atualizar produtos cadastrados.
         public async Task<AtualizarProdutoResponse> UpdateAsync(Guid id, AtualizarProdutoRequest updateRequest)
         {
+            if (updateRequest == null)
+                throw new ArgumentNullException(nameof(updateRequest));
+
             //1- encontrar pelo id.
             var produto = await _repo.GetByIdAsync(id);
+
+            if (produto == null)
+                throw new InvalidOperationException("Produto nao encontrado.");
 
             //2- request,
             produto.Produto = updateRequest.Produto;
