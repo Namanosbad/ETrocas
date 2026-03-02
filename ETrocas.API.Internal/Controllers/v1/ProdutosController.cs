@@ -98,7 +98,12 @@ namespace ETrocas.API.Internal.Controllers.v1
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> AtualizarProdutoAsync(Guid id, [FromBody] AtualizarProdutoRequest updateRequest)
         {
-            var produto = await _produtoService.UpdateAsync(id, updateRequest);
+            var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(usuarioId) || !Guid.TryParse(usuarioId, out var usuarioGuid))
+                return Unauthorized();
+
+            var produto = await _produtoService.UpdateAsync(id, updateRequest, usuarioGuid);
             return Ok(produto);
         }
 
@@ -116,7 +121,12 @@ namespace ETrocas.API.Internal.Controllers.v1
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> DeletarProdutoAsync(Guid id)
         {
-            await _produtoService.DeletarProdutoAsync(id);
+            var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(usuarioId) || !Guid.TryParse(usuarioId, out var usuarioGuid))
+                return Unauthorized();
+
+            await _produtoService.DeletarProdutoAsync(id, usuarioGuid);
             return NoContent();
         }
     }
