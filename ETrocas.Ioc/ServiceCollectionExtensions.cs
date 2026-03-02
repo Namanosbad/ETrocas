@@ -1,6 +1,8 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
+using AutoMapper;
 using ETrocas.Application.Interfaces;
 using ETrocas.Application.Services.v1;
+using Etrocas.Application.Mappings;
 using ETrocas.Database;
 using ETrocas.Database.Repository;
 using ETrocas.Domain.Interfaces;
@@ -27,6 +29,7 @@ namespace ETrocas.Ioc
             services.AddDbContext(configuration);
             services.AddAuthentication(configuration);
             services.AddApplicationServices();
+            services.AddAutoMapper(typeof(PropostaMappingProfile).Assembly);
             services.AddApiVersioning(configuration);
             return services;
         }
@@ -80,6 +83,7 @@ namespace ETrocas.Ioc
             services.AddTransient<IProdutoRepository, ProdutoRepository>();
             services.AddTransient<IProdutoService, ProdutoService>();
             services.AddScoped(typeof(IPropostaRepository), typeof(PropostaRepository));
+            services.AddScoped<IPropostaService, PropostaService>();
             services.AddScoped(typeof(IRepository<>), typeof(EFRepository<>));
          
 
