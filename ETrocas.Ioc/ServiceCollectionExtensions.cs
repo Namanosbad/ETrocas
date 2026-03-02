@@ -2,7 +2,7 @@ using Asp.Versioning;
 using AutoMapper;
 using ETrocas.Application.Interfaces;
 using ETrocas.Application.Services.v1;
-using Etrocas.Application.Mappings;
+using ETrocas.Application.Mappings;
 using ETrocas.Database;
 using ETrocas.Database.Repository;
 using ETrocas.Domain.Interfaces;
