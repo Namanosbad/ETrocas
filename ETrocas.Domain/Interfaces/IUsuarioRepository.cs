@@ -5,6 +5,6 @@ namespace ETrocas.Domain.Interfaces;
 public interface IUsuarioRepository
 {
     Task<Usuario> RegistrarUsuarioAsync(Usuario usuario);
-    Task<Usuario> LoginUsuarioAsync(Usuario usuario);
-    Task<Usuario> ValidarEmailAsync(string email);
-} 
+    Task<Usuario?> ObterPorEmailAsync(string email);
+    Task<Usuario?> ValidarEmailAsync(string email);
+}
