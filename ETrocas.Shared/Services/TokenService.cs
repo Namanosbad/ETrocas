@@ -13,11 +13,17 @@ namespace ETrocas.Shared.Services
     public class TokenService(IOptions<TokenConfig> config) : ITokenService
     {
         private readonly TokenConfig _config = config.Value;
+        private readonly string? _envTokenKey = Environment.GetEnvironmentVariable("ETROCAS_TOKEN_KEY");
 
         public string Gerar(Usuario usuario)
         {
             var handler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_config.Key);
+            var tokenKey = string.IsNullOrWhiteSpace(_envTokenKey) ? _config.Key : _envTokenKey;
+
+            if (string.IsNullOrWhiteSpace(tokenKey))
+                throw new InvalidOperationException("A chave JWT não foi configurada.");
+
+            var key = Encoding.ASCII.GetBytes(tokenKey);
             var credentials = new SigningCredentials(
                                                      new SymmetricSecurityKey(key),
                                                      SecurityAlgorithms.HmacSha256Signature

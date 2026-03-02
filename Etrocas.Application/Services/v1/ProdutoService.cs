@@ -3,13 +3,11 @@ using ETrocas.Application.Requests;
 using ETrocas.Application.Responses;
 using ETrocas.Domain.Entities;
 using ETrocas.Domain.Interfaces;
-//logica do negocio
+
 namespace ETrocas.Application.Services.v1
 {
-    //herda da interface
     public class ProdutoService : IProdutoService
     {
-        //injeção de dependencia
         private readonly IProdutoRepository _produtoRepository;
         private readonly IRepository<Produtos> _repo;
 
@@ -19,7 +17,6 @@ namespace ETrocas.Application.Services.v1
             _repo = repo;
         }
 
-        //logica do cadastro de produto.
         public async Task<CadastrarProdutoResponse> CadastrarProdutoAsync(CadastrarProdutoRequest cadastrarProdutoRequest, Guid usuarioGuid)
         {
             if (cadastrarProdutoRequest == null)
@@ -29,8 +26,7 @@ namespace ETrocas.Application.Services.v1
                 string.IsNullOrWhiteSpace(cadastrarProdutoRequest.Tipo))
                 throw new ArgumentException("Produto e tipo são obrigatórios.");
 
-            //Aqui eu cadastro o produto a linha 23 é o objeto de entrada que representa o request.
-            var CadastrarProduto = new Produtos
+            var produtoParaCadastro = new Produtos
             {
                 Id = Guid.NewGuid(),
                 Produto = cadastrarProdutoRequest.Produto,
@@ -42,26 +38,23 @@ namespace ETrocas.Application.Services.v1
                 Tipo = cadastrarProdutoRequest.Tipo
             };
 
-            //Aqui eu salvo no banco esse produto cadastrado. Uso o _produtoRepository e o metodo no banco para lidar com o banco 
-            var ProdutoCriado = await _produtoRepository.CadastrarProdutoAsync(CadastrarProduto);
+            var produtoCriado = await _produtoRepository.CadastrarProdutoAsync(produtoParaCadastro);
 
-            //O que vai retornar pro usuario.
             return new CadastrarProdutoResponse
             {
-                Id = ProdutoCriado.Id,
-                Produto = ProdutoCriado.Produto,
-                Tipo = ProdutoCriado.Tipo,
-                Valor = ProdutoCriado.Valor,
-                Descricao = ProdutoCriado.Descricao,
-                Disponivel = ProdutoCriado.Disponivel,
-                DataCadastro = ProdutoCriado.DataCadastro,
-                ImageUrl = ProdutoCriado.ImageUrl,
-                UsuarioId = ProdutoCriado.UsuarioId,
+                Id = produtoCriado.Id,
+                Produto = produtoCriado.Produto,
+                Tipo = produtoCriado.Tipo,
+                Valor = produtoCriado.Valor,
+                Descricao = produtoCriado.Descricao,
+                Disponivel = produtoCriado.Disponivel,
+                DataCadastro = produtoCriado.DataCadastro,
+                ImageUrl = produtoCriado.ImageUrl,
+                UsuarioId = produtoCriado.UsuarioId,
             };
         }
 
 
-        //logica para deletar um produto.
         public async Task DeletarProdutoAsync(Guid id)
         {
 
@@ -72,7 +65,6 @@ namespace ETrocas.Application.Services.v1
             await _repo.DeleteAsync(id);
         }
 
-        //logica para puxar produto pelo Id
         public async Task<Produtos> GetByIdAsync(Guid id)
         {
             var produto = await _repo.GetByIdAsync(id);
@@ -81,26 +73,22 @@ namespace ETrocas.Application.Services.v1
             return produto;
         }
 
-        //logica para puxar todos os produtos.
         public async Task<IEnumerable<Produtos>> GetAllAsync()
         {
             var produtos = await _repo.GetAllAsync();
             return produtos;
         }
 
-        //logica para atualizar produtos cadastrados.
         public async Task<AtualizarProdutoResponse> UpdateAsync(Guid id, AtualizarProdutoRequest updateRequest)
         {
             if (updateRequest == null)
                 throw new ArgumentNullException(nameof(updateRequest));
 
-            //1- encontrar pelo id.
             var produto = await _repo.GetByIdAsync(id);
 
             if (produto == null)
                 throw new InvalidOperationException("Produto nao encontrado.");
 
-            //2- request,
             produto.Produto = updateRequest.Produto;
             produto.Tipo = updateRequest.Tipo;
             produto.Valor = updateRequest.Valor;
@@ -108,10 +96,8 @@ namespace ETrocas.Application.Services.v1
             produto.Disponivel = updateRequest.Disponivel;
             produto.ImageUrl = updateRequest.ImageUrl;
 
-            //faz o update
             await _repo.UpdateAsync(produto);
 
-            //3-response,//4- retorno.
             return new AtualizarProdutoResponse
             {
                 Id = produto.Id,

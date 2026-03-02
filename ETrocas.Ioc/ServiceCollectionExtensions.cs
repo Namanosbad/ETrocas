@@ -39,7 +39,14 @@ namespace ETrocas.Ioc
             services.AddDbContext<ETrocasDbContext>((serviceProvider, options) =>
             {
                 var config = serviceProvider.GetRequiredService<IOptions<DbConfig>>().Value;
-                var connectionString = config.ConnectionString;
+                var envConnectionString = Environment.GetEnvironmentVariable("ETROCAS_DB_CONNECTION_STRING");
+                var connectionString = string.IsNullOrWhiteSpace(envConnectionString)
+                    ? config.ConnectionString
+                    : envConnectionString;
+
+                if (string.IsNullOrWhiteSpace(connectionString))
+                    throw new InvalidOperationException("A connection string não foi configurada.");
+
                 options.UseSqlServer(connectionString);
             });
 
@@ -80,7 +87,14 @@ namespace ETrocas.Ioc
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(x =>
             {
-                var key = configuration["TokenConfig:Key"];
+                var envKey = Environment.GetEnvironmentVariable("ETROCAS_TOKEN_KEY");
+                var key = string.IsNullOrWhiteSpace(envKey)
+                    ? configuration["TokenConfig:Key"]
+                    : envKey;
+
+                if (string.IsNullOrWhiteSpace(key))
+                    throw new InvalidOperationException("A chave JWT não foi configurada.");
+
                 var asciiKey = Encoding.ASCII.GetBytes(key!);
 
                 x.TokenValidationParameters = new TokenValidationParameters
