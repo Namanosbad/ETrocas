@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.Linq;
 using System.Text;
 
 namespace ETrocas.Ioc
@@ -60,18 +61,22 @@ namespace ETrocas.Ioc
 
             var allowedOrigins = configuration
                 .GetSection($"{nameof(CorsConfig)}:{nameof(CorsConfig.AllowedOrigins)}")
-                .Get<string[]>() ?? [];
+                .Get<string[]>()
+                ?.Where(origin => !string.IsNullOrWhiteSpace(origin))
+                .Select(origin => origin.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray() ?? [];
+
+            if (allowedOrigins.Length == 0)
+                throw new InvalidOperationException("CorsConfig:AllowedOrigins deve conter ao menos uma origem válida para a política RestrictedCors.");
 
             services.AddCors(options =>
             {
                 options.AddPolicy("RestrictedCors", policy =>
                 {
-                    if (allowedOrigins.Length > 0)
-                    {
-                        policy.WithOrigins(allowedOrigins)
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
-                    }
+                    policy.WithOrigins(allowedOrigins)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
                 });
             });
 

@@ -7,8 +7,8 @@ namespace ETrocas.Application.Interfaces;
 public interface IProdutoService
 {
     Task<CadastrarProdutoResponse> CadastrarProdutoAsync(CadastrarProdutoRequest cadastrarProdutoRequest, Guid usuarioGuid);
-    Task DeletarProdutoAsync(Guid id);
+    Task DeletarProdutoAsync(Guid id, Guid usuarioGuid);
     Task<Produtos> GetByIdAsync(Guid id);
     Task<IEnumerable<Produtos>> GetAllAsync();
-    Task<AtualizarProdutoResponse> UpdateAsync(Guid id, AtualizarProdutoRequest updateRequest);
+    Task<AtualizarProdutoResponse> UpdateAsync(Guid id, AtualizarProdutoRequest updateRequest, Guid usuarioGuid);
 }

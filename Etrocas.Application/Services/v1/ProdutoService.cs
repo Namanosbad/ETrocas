@@ -55,12 +55,14 @@ namespace ETrocas.Application.Services.v1
         }
 
 
-        public async Task DeletarProdutoAsync(Guid id)
+        public async Task DeletarProdutoAsync(Guid id, Guid usuarioGuid)
         {
-
-            var exist = await _repo.ExistAsync(id);
-            if (!exist)
+            var produto = await _repo.GetByIdAsync(id);
+            if (produto == null)
                 throw new InvalidOperationException("Produto nao encontrado.");
+
+            if (produto.UsuarioId != usuarioGuid)
+                throw new UnauthorizedAccessException("Você não tem permissão para excluir este produto.");
 
             await _repo.DeleteAsync(id);
         }
@@ -79,7 +81,7 @@ namespace ETrocas.Application.Services.v1
             return produtos;
         }
 
-        public async Task<AtualizarProdutoResponse> UpdateAsync(Guid id, AtualizarProdutoRequest updateRequest)
+        public async Task<AtualizarProdutoResponse> UpdateAsync(Guid id, AtualizarProdutoRequest updateRequest, Guid usuarioGuid)
         {
             if (updateRequest == null)
                 throw new ArgumentNullException(nameof(updateRequest));
@@ -88,6 +90,9 @@ namespace ETrocas.Application.Services.v1
 
             if (produto == null)
                 throw new InvalidOperationException("Produto nao encontrado.");
+
+            if (produto.UsuarioId != usuarioGuid)
+                throw new UnauthorizedAccessException("Você não tem permissão para alterar este produto.");
 
             produto.Produto = updateRequest.Produto;
             produto.Tipo = updateRequest.Tipo;
