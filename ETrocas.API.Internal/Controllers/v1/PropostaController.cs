@@ -1,10 +1,7 @@
 ﻿using Asp.Versioning;
 using ETrocas.Application.Interfaces;
 using ETrocas.Application.Requests;
-using ETrocas.Application.Responses;
-using ETrocas.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ETrocas.API.Internal.Controllers.v1
