@@ -1,5 +1,8 @@
 ﻿namespace ETrocas.Application.Responses;
-//o que o swagger vai devolver.
+
+/// <summary>
+/// Dados retornados após operações com produto.
+/// </summary>
 public class CadastrarProdutoResponse
 {
     public Guid UsuarioId { get; set; }
@@ -11,5 +14,4 @@ public class CadastrarProdutoResponse
     public bool Disponivel { get; set; }
     public DateTime DataCadastro { get; set; } = DateTime.Now;
     public string? ImageUrl { get; set; }
-
 }

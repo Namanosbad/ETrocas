@@ -1,5 +1,8 @@
 ﻿namespace ETrocas.Application.Responses;
-//resposta/ O que o swagger vai devolver
+
+/// <summary>
+/// Retorno do login com token de acesso.
+/// </summary>
 public class LoginUsuarioResponse
 {
     public Guid Id { get; set; }

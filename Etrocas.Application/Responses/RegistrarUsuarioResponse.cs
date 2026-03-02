@@ -1,5 +1,8 @@
 ﻿namespace ETrocas.Application.Responses;
 
+/// <summary>
+/// Retorno de cadastro de usuário.
+/// </summary>
 public class RegistrarUsuarioResponse
 {
     public Guid Id { get; set; }

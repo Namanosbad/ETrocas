@@ -1,5 +1,8 @@
 ﻿namespace ETrocas.Application.Responses;
 
+/// <summary>
+/// Retorno com dados do produto atualizado.
+/// </summary>
 public class AtualizarProdutoResponse
 {
     public Guid Id { get; set; }

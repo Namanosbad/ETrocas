@@ -1,5 +1,8 @@
 ﻿namespace ETrocas.Application.Requests;
-//pergunta / o que o usuario vai colocar
+
+/// <summary>
+/// Credenciais para autenticação do usuário.
+/// </summary>
 public class LoginUsuarioRequest
 {
     public string Email { get; set; }

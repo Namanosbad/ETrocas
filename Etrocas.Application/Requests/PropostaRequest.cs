@@ -1,7 +1,8 @@
-﻿using ETrocas.Domain.Entities;
+﻿namespace ETrocas.Application.Requests;
 
-namespace ETrocas.Application.Requests;
-
+/// <summary>
+/// Dados para criação de proposta de troca.
+/// </summary>
 public class PropostaRequest
 {
     public Guid ProdutoDesejadoId { get; set; }

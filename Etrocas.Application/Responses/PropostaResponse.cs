@@ -2,7 +2,10 @@
 
 namespace ETrocas.Application.Responses;
 
-    public class PropostaResponse
+/// <summary>
+/// Retorno de proposta criada.
+/// </summary>
+public class PropostaResponse
 {
     public Guid Id { get; set; }
     public EStatusProposta Status { get; set; }
