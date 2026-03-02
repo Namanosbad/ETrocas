@@ -1,5 +1,8 @@
 ﻿namespace ETrocas.Application.Requests;
 
+/// <summary>
+/// Dados utilizados para atualizar um produto.
+/// </summary>
 public class AtualizarProdutoRequest
 {
     public string? Produto { get; set; }
