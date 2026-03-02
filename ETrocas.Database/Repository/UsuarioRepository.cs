@@ -23,15 +23,13 @@ namespace ETrocas.Database.Repository
             return usuario;
         }
 
-        public async Task<Usuario> LoginUsuarioAsync(Usuario usuario)
+        public async Task<Usuario?> ObterPorEmailAsync(string email)
         {
             return await _context.Usuarios
-                .FirstOrDefaultAsync(u =>
-                    u.Email == usuario.Email &&
-                    u.SenhaHash == usuario.SenhaHash);
+                .FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public async Task<Usuario> ValidarEmailAsync(string email)
+        public async Task<Usuario?> ValidarEmailAsync(string email)
         {
             return await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
         }

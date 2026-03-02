@@ -13,12 +13,17 @@ namespace ETrocas.Application.Services.v1
         //Injeção de dependencias.
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly ITokenService _tokenService;
+        private readonly IPasswordHasher _passwordHasher;
 
         //Injeção de dependencias.
-        public UsuarioService(IUsuarioRepository usuarioRepository, ITokenService tokenService)
+        public UsuarioService(
+            IUsuarioRepository usuarioRepository,
+            ITokenService tokenService,
+            IPasswordHasher passwordHasher)
         {
             _usuarioRepository = usuarioRepository;
             _tokenService = tokenService;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<RegistrarUsuarioResponse> RegistrarUsuarioAsync(RegistrarUsuarioRequest request)
@@ -31,13 +36,17 @@ namespace ETrocas.Application.Services.v1
                 string.IsNullOrWhiteSpace(request.SenhaHash))
                 throw new ArgumentException("Nome, email e senha são obrigatórios.");
 
+            var usuarioExistente = await _usuarioRepository.ValidarEmailAsync(request.Email);
+            if (usuarioExistente != null)
+                throw new ArgumentException("Email já cadastrado.");
+
             //cria um novo objeto Usuario. Esse objeto representa um novo usuário que será registrado no sistema.
             var CadastroUsuario = new Usuario
             {
                 Id = Guid.NewGuid(),
                 Nome = request.Nome,
                 Email = request.Email,
-                SenhaHash = request.SenhaHash,
+                SenhaHash = _passwordHasher.Hash(request.SenhaHash),
             };
 
             //aqui grava no banco conforme o repository está feito.
@@ -63,15 +72,9 @@ namespace ETrocas.Application.Services.v1
                 throw new ArgumentException("Email e senha são obrigatórios.");
 
             //criando o novo objeto. Esse objeto representa o usuario que vai logar no sistema
-            var usuarioLogin = new Usuario
-            {
-                Email = request.Email,
-                SenhaHash = request.SenhaHash,
-            };
-            //salva o objeto no banco.
-            var usuario = await _usuarioRepository.LoginUsuarioAsync(usuarioLogin);
+            var usuario = await _usuarioRepository.ObterPorEmailAsync(request.Email);
 
-            if (usuario == null)
+            if (usuario == null || !_passwordHasher.Verify(request.SenhaHash, usuario.SenhaHash ?? string.Empty))
                 throw new UnauthorizedAccessException("Credenciais inválidas.");
 
             var token = _tokenService.Gerar(usuario);

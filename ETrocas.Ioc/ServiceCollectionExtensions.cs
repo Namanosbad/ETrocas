@@ -17,16 +17,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-//Injeção de dependencia.
 namespace ETrocas.Ioc
 {
-        //
     public static class ServiceCollectionExtensions
     {
-        //
         public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext(configuration);
+            services.AddCorsPolicy(configuration);
             services.AddAuthentication(configuration);
             services.AddApplicationServices();
             services.AddAutoMapper(typeof(PropostaMappingProfile).Assembly);
@@ -36,20 +34,43 @@ namespace ETrocas.Ioc
 
         private static IServiceCollection AddDbContext(this IServiceCollection services, IConfiguration configuration)
         {
-            //
             services.Configure<DbConfig>(config => configuration.GetRequiredSection(nameof(DbConfig)).Bind(config));
 
-            //options 
             services.AddDbContext<ETrocasDbContext>((serviceProvider, options) =>
-                {
-                    var config = serviceProvider.GetRequiredService<IOptions<DbConfig>>().Value;
-                    var connectionString = config.ConnectionString;
-                    options.UseSqlServer(connectionString);
-                });
+            {
+                var config = serviceProvider.GetRequiredService<IOptions<DbConfig>>().Value;
+                var connectionString = config.ConnectionString;
+                options.UseSqlServer(connectionString);
+            });
 
             return services;
         }
-        //
+
+        private static IServiceCollection AddCorsPolicy(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<CorsConfig>(config =>
+                configuration.GetSection(nameof(CorsConfig)).Bind(config));
+
+            var allowedOrigins = configuration
+                .GetSection($"{nameof(CorsConfig)}:{nameof(CorsConfig.AllowedOrigins)}")
+                .Get<string[]>() ?? [];
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("RestrictedCors", policy =>
+                {
+                    if (allowedOrigins.Length > 0)
+                    {
+                        policy.WithOrigins(allowedOrigins)
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    }
+                });
+            });
+
+            return services;
+        }
+
         private static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<TokenConfig>(config => configuration.GetRequiredSection(nameof(TokenConfig)).Bind(config));
@@ -60,7 +81,7 @@ namespace ETrocas.Ioc
             }).AddJwtBearer(x =>
             {
                 var key = configuration["TokenConfig:Key"];
-                var asciiKey = Encoding.ASCII.GetBytes(key);
+                var asciiKey = Encoding.ASCII.GetBytes(key!);
 
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -72,6 +93,7 @@ namespace ETrocas.Ioc
             });
 
             services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<IPasswordHasher, PasswordHasher>();
 
             return services;
         }
@@ -85,21 +107,20 @@ namespace ETrocas.Ioc
             services.AddScoped(typeof(IPropostaRepository), typeof(PropostaRepository));
             services.AddScoped<IPropostaService, PropostaService>();
             services.AddScoped(typeof(IRepository<>), typeof(EFRepository<>));
-         
 
             return services;
         }
 
         public static IServiceCollection AddApiVersioning(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddApiVersioning(o=>
+            services.AddApiVersioning(o =>
             {
                 o.DefaultApiVersion = new ApiVersion(1, 0);
                 o.AssumeDefaultVersionWhenUnspecified = true;
                 o.ReportApiVersions = true;
                 o.ApiVersionReader = ApiVersionReader.Combine(
-                                     new QueryStringApiVersionReader(),
-                                     new UrlSegmentApiVersionReader());
+                    new QueryStringApiVersionReader(),
+                    new UrlSegmentApiVersionReader());
 
             }).AddApiExplorer(options =>
             {
