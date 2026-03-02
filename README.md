@@ -15,30 +15,31 @@ O objetivo principal do ETrocas é demonstrar na prática como aplicar arquitetu
 -   **ASP.NET Core 8 (Web API)**
 -   **Entity Framework Core 8**
 -   **SQL Server**
--   **Docker**
--   **Arquitetura em Camadas (Domain, Database, Application, API,
-    Shared)**
+-   **JWT (Bearer Token)**
+-   **Swagger / OpenAPI**
+-   **Arquitetura em Camadas (Domain, Database, Application, API, IoC, Shared)**
 
 ------------------------------------------------------------------------
 
-## 📂 Estrutura do Projeto
+## 📂 Estrutura do Projeto (pastas reais)
 
     ETrocas/
-    │── ETrocas.Domain/        # Entidades e interfaces de domínio
-    │── ETrocas.Database/      # Configurações do banco e migrations
-    │── ETrocas.Application/   # Serviços, requests e responses
-    │── ETrocas.Api/           # Endpoints (controllers)
-    │── ETrocas.Shared/        # Enums, constantes e utilitários
+    │── ETrocas.API.Internal/   # API (controllers, Program, configs)
+    │── Etrocas.Application/    # Serviços, requests e responses
+    │── ETrocas.Database/       # DbContext, repositórios e migrations
+    │── ETrocas.Domain/         # Entidades e interfaces de domínio
+    │── ETrocas.Ioc/            # Injeção de dependências e configuração de serviços
+    │── ETrocas.Shared/         # Configurações e serviços compartilhados
 
 ------------------------------------------------------------------------
 
 ## 🔑 Funcionalidades Principais
 
 -   Cadastro e autenticação de usuários
--   Cadastro de produtos
--   Criação e gerenciamento de propostas de troca
--   Aceitar ou rejeitar propostas
--   Histórico de trocas realizadas
+-   Cadastro, atualização, consulta e remoção de produtos
+-   Criação de propostas de troca
+-   Versionamento de API (`v1`)
+-   Autenticação com JWT em rotas protegidas
 
 ------------------------------------------------------------------------
 
@@ -46,61 +47,66 @@ O objetivo principal do ETrocas é demonstrar na prática como aplicar arquitetu
 
 ### 1️⃣ Clonar o repositório
 
-``` bash
+```bash
 git clone https://github.com/Namanosbad/ETrocas.git
 cd ETrocas
 ```
 
 ### 2️⃣ Configurar o Banco de Dados
 
-No arquivo `appsettings.json`, configure a connection string para seu
-**SQL Server**.
+No arquivo `ETrocas.API.Internal/appsettings.json`, configure:
+
+- `DbConfig:ConnectionString`
+- `TokenConfig:Key`
 
 ### 3️⃣ Executar as Migrations
 
-``` bash
-dotnet ef database update --project ETrocas.Database --startup-project ETrocas.Api
+```bash
+dotnet ef database update --project ETrocas.Database --startup-project ETrocas.API.Internal
 ```
 
-### 4️⃣ Rodar o Projeto
+### 4️⃣ Rodar a API
 
-``` bash
-dotnet run --project ETrocas.Api
+```bash
+dotnet run --project ETrocas.API.Internal
 ```
 
-A API estará disponível em: **https://localhost:7143** 🚀
+A API estará disponível conforme as URLs definidas em:
+`ETrocas.API.Internal/Properties/launchSettings.json`.
 
 ------------------------------------------------------------------------
 
-## 📌 Endpoints Principais
+## 📌 Endpoints atuais (v1)
 
-### Usuário
+### Usuário (`CadastrarUsuarioController`)
 
--   `POST /api/v1/usuario/registrar` → Registrar novo usuário
--   `POST /api/v1/usuario/login` → Login
+-   `POST /api/v1/CadastrarUsuario/registrar`
+-   `POST /api/v1/CadastrarUsuario/login`
 
-### Produtos
+### Produtos (`ProdutosController`)
 
--   `GET /api/v1/produto` → Listar produtos
--   `POST /api/v1/produto` → Criar produto
+-   `POST /api/v1/Produtos/CadastrarProduto` (autenticado)
+-   `GET /api/v1/Produtos/BuscarTodosProdutos`
+-   `GET /api/v1/Produtos/BuscarProduto/{id}` (autenticado)
+-   `PUT /api/v1/Produtos/AtualizarProduto/{id}` (autenticado)
+-   `DELETE /api/v1/Produtos/DeletarProduto?id={id}` (autenticado)
 
-### Propostas
+### Propostas (`PropostaController`)
 
--   `POST /api/v1/proposta` → Criar proposta de troca
--   `GET /api/v1/proposta/minhas` → Minhas propostas feitas (em desenvolvimento)
--   `GET /api/v1/proposta/recebidas` → Propostas recebidas (em desenvolvimento)
+-   `POST /api/v1/Proposta/FazerProposta/{id}` (autenticado)
 
 ------------------------------------------------------------------------
 
-## 🐳 Executando com Docker
+## 🐳 Docker
 
-``` bash
-docker-compose up --build -d
-```
+Atualmente o repositório contém apenas o `Dockerfile` da API em
+`ETrocas.API.Internal/Dockerfile`.
+
+> Não há arquivo `docker-compose.yml` versionado neste momento.
 
 ------------------------------------------------------------------------
 
 ## 👨‍💻 Autor
 
-Desenvolvido por **Namanosbad** 👋\
+Desenvolvido por **Namanosbad** 👋  
 Se gostou, deixe uma ⭐ no repositório!

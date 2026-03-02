@@ -26,8 +26,24 @@ namespace ETrocas.API.Internal.Controllers.v1
         [HttpPost("FazerProposta/{id:guid}")]
         public async Task<IActionResult> FazerProposta(Guid id, [FromBody] PropostaRequest propostaRequest)
         {
-            var proposta = await _propostaService.FazerPropostaAsync(propostaRequest); 
-            return Ok(proposta);
+            if (id != propostaRequest.ProdutoDesejadoId)
+            {
+                return BadRequest("O id da rota deve ser o mesmo ProdutoDesejadoId informado no corpo da requisição.");
+            }
+
+            try
+            {
+                var proposta = await _propostaService.FazerPropostaAsync(propostaRequest);
+                return Ok(proposta);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }
