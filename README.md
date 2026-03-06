@@ -7,7 +7,13 @@ A aplicação permite que pessoas cadastrem seus produtos e façam propostas de 
 O projeto foi construído com foco em boas práticas de desenvolvimento, separação de responsabilidades e escalabilidade.
 
 ------------------------------------------------------------------------
+## 🖼️ Galeria do Projeto
 
+### Swagger
+
+![Swagger](https://github.com/user-attachments/assets/b07c374e-a5e5-4bc3-a415-25c4564da43c)
+
+------------------------------------------------------------------------
 ## 🚀 Tecnologias Utilizadas
 
 - **ASP.NET Core 8 (Web API)**
