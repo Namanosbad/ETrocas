@@ -34,7 +34,7 @@ namespace ETrocas.API.Internal.Controllers.v1
         /// <response code="401">Usuário não autenticado.</response>
         /// <response code="404">Produto não encontrado para proposta.</response>
         [Authorize]
-        [HttpPost("FazerProposta/{id:guid}")]
+        [HttpPost("{id:guid}")]
         [ProducesResponseType(typeof(PropostaResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

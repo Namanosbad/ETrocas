@@ -33,7 +33,7 @@ namespace ETrocas.API.Internal.Controllers.v1
         /// <response code="400">Dados inválidos para cadastro.</response>
         /// <response code="401">Usuário não autenticado.</response>
         [Authorize]
-        [HttpPost("CadastrarProduto")]
+        [HttpPost]
         [ProducesResponseType(typeof(CadastrarProdutoResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -53,7 +53,7 @@ namespace ETrocas.API.Internal.Controllers.v1
         /// </summary>
         /// <returns>Lista de produtos.</returns>
         /// <response code="200">Produtos retornados com sucesso.</response>
-        [HttpGet("BuscarTodosProdutos")]
+        [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<CadastrarProdutoResponse>), StatusCodes.Status200OK)]
         public async Task<IActionResult> TodosProdutosAsync()
         {
@@ -70,7 +70,7 @@ namespace ETrocas.API.Internal.Controllers.v1
         /// <response code="401">Usuário não autenticado.</response>
         /// <response code="404">Produto não encontrado.</response>
         [Authorize]
-        [HttpGet("BuscarProduto/{id:guid}")]
+        [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(CadastrarProdutoResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -91,7 +91,7 @@ namespace ETrocas.API.Internal.Controllers.v1
         /// <response code="401">Usuário não autenticado.</response>
         /// <response code="404">Produto não encontrado.</response>
         [Authorize]
-        [HttpPut("AtualizarProduto/{id:guid}")]
+        [HttpPut("{id:guid}")]
         [ProducesResponseType(typeof(AtualizarProdutoResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -115,7 +115,7 @@ namespace ETrocas.API.Internal.Controllers.v1
         /// <response code="401">Usuário não autenticado.</response>
         /// <response code="404">Produto não encontrado.</response>
         [Authorize]
-        [HttpDelete("DeletarProduto/{id:guid}")]
+        [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

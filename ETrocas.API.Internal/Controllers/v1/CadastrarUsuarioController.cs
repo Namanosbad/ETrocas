@@ -26,7 +26,7 @@ namespace ETrocas.API.Internal.Controllers.v1
         /// <returns>Dados do usuário cadastrado.</returns>
         /// <response code="200">Usuário cadastrado com sucesso.</response>
         /// <response code="400">Dados inválidos para cadastro.</response>
-        [HttpPost("registrar")]
+        [HttpPost]
         [ProducesResponseType(typeof(RegistrarUsuarioResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Cadastrar([FromBody] RegistrarUsuarioRequest request)
