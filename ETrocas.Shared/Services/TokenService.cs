@@ -12,13 +12,18 @@ namespace ETrocas.Shared.Services
 {
     public class TokenService(IOptions<TokenConfig> config) : ITokenService
     {
+        private const string DevelopmentFallbackJwtKey = "ETrocas-Dev-Only-Jwt-Key-Change-In-Production";
         private readonly TokenConfig _config = config.Value;
         private readonly string? _envTokenKey = Environment.GetEnvironmentVariable("ETROCAS_TOKEN_KEY");
-
+        private readonly string? _aspNetCoreEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
         public string Gerar(Usuario usuario)
         {
             var handler = new JwtSecurityTokenHandler();
             var tokenKey = string.IsNullOrWhiteSpace(_envTokenKey) ? _config.Key : _envTokenKey;
+            var isDevelopmentEnvironment = string.Equals(_aspNetCoreEnvironment, "Development", StringComparison.OrdinalIgnoreCase);
+
+            if (string.IsNullOrWhiteSpace(tokenKey) && isDevelopmentEnvironment)
+                tokenKey = DevelopmentFallbackJwtKey;
 
             if (string.IsNullOrWhiteSpace(tokenKey))
                 throw new InvalidOperationException("A chave JWT não foi configurada.");

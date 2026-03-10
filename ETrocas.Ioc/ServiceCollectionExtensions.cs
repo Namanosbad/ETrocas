@@ -22,6 +22,7 @@ namespace ETrocas.Ioc
 {
     public static class ServiceCollectionExtensions
     {
+        private const string DevelopmentFallbackJwtKey = "ETrocas-Dev-Only-Jwt-Key-Change-In-Production";
         public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext(configuration);
@@ -96,6 +97,11 @@ namespace ETrocas.Ioc
                 var key = string.IsNullOrWhiteSpace(envKey)
                     ? configuration["TokenConfig:Key"]
                     : envKey;
+                var environment = configuration["ASPNETCORE_ENVIRONMENT"];
+                var isDevelopmentEnvironment = string.Equals(environment, "Development", StringComparison.OrdinalIgnoreCase);
+
+                if (string.IsNullOrWhiteSpace(key) && isDevelopmentEnvironment)
+                    key = DevelopmentFallbackJwtKey;
 
                 if (string.IsNullOrWhiteSpace(key))
                     throw new InvalidOperationException("A chave JWT não foi configurada.");

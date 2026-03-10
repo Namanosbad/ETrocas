@@ -13,7 +13,7 @@ namespace ETrocas.API.Internal.Controllers.v1
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("1.0")]
     [Produces("application/json")]
-    public class UsuariosController : Controller
+    public class UsuariosController : ControllerBase
     {
         private readonly IUsuarioService _usuarioService;
 
