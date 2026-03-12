@@ -113,9 +113,15 @@ A API estará disponível conforme as URLs definidas em:
 - `PUT /api/v1/Produtos/AtualizarProduto/{id}` (autenticado)
 - `DELETE /api/v1/Produtos/DeletarProduto/{id}` (autenticado)
 
-### Propostas (`PropostaController`)
+### Propostas (`PropostasController`)
 
-- `POST /api/v1/Proposta/FazerProposta/{id}` (autenticado)
+- `POST /api/v1/Propostas/{id}` (autenticado)
+- `GET /api/v1/Propostas/enviadas` (autenticado)
+- `GET /api/v1/Propostas/recebidas` (autenticado)
+- `PUT /api/v1/Propostas/{id}/aceitar` (autenticado)
+- `PUT /api/v1/Propostas/{id}/recusar` (autenticado)
+- `PUT /api/v1/Propostas/{id}/cancelar` (autenticado)
+- `PUT /api/v1/Propostas/{id}/concluir` (autenticado)
 
 ------------------------------------------------------------------------
 
