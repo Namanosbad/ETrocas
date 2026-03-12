@@ -12,37 +12,42 @@ namespace ETrocas.Database.EntitiesConfiguration
             builder.HasKey(p => p.Id);
 
             builder.Property(p => p.Id)
-                         .IsRequired()
-                         .ValueGeneratedOnAdd();
+                .IsRequired()
+                .ValueGeneratedOnAdd();
 
             builder.Property(p => p.DataProposta)
-                        .IsRequired();
+                .IsRequired();
 
             builder.Property(p => p.DataResposta)
-                        .IsRequired();
+                .IsRequired(false);
 
             builder.Property(p => p.StatusProposta)
-                        .IsRequired();
+                .IsRequired();
 
-            builder.Property(p =>p.ValorProposto)
-                        .IsRequired();
+            builder.Property(p => p.ValorProposto)
+                .IsRequired();
 
             builder.Property(p => p.Mensagem);
 
             builder.HasOne(p => p.ProdutoDesejado)
-                         .WithMany()
-                         .HasForeignKey(p => p.ProdutoDesejadoId)
-                         .OnDelete(DeleteBehavior.Restrict);
+                .WithMany()
+                .HasForeignKey(p => p.ProdutoDesejadoId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(p => p.ProdutoOfertado)
-                         .WithMany()
-                         .HasForeignKey(p => p.ProdutoOfertadoId)
-                         .OnDelete(DeleteBehavior.Restrict);
+                .WithMany()
+                .HasForeignKey(p => p.ProdutoOfertadoId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(p => p.UsuarioProposta)
-                         .WithMany(u => u.PropostasFeitas)
-                         .HasForeignKey(p => p.UsuarioPropostaId)
-                         .OnDelete(DeleteBehavior.Restrict);
+                .WithMany(u => u.PropostasFeitas)
+                .HasForeignKey(p => p.UsuarioPropostaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(p => p.UsuarioRecebedor)
+                .WithMany(u => u.PropostasRecebidas)
+                .HasForeignKey(p => p.UsuarioRecebedorId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
