@@ -7,13 +7,16 @@ public class Proposta : IEntity
 {
     public Guid Id { get; set; }
     public required DateTime DataProposta { get; set; } = DateTime.Now;
-    public required DateTime DataResposta {  get; set; }
+    public DateTime? DataResposta { get; set; }
     public EStatusProposta StatusProposta { get; set; } = EStatusProposta.Pendente;
     public decimal ValorProposto { get; set; }
     public string? Mensagem { get; set; }
 
     public Guid UsuarioPropostaId { get; set; }
     public Usuario? UsuarioProposta { get; set; }
+
+    public Guid UsuarioRecebedorId { get; set; }
+    public Usuario? UsuarioRecebedor { get; set; }
 
     public Guid ProdutoDesejadoId { get; set; }
     public Produtos? ProdutoDesejado { get; set; }

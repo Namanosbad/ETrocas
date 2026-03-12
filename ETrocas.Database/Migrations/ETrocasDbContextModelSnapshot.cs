@@ -74,7 +74,6 @@ namespace ETrocas.Database.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DataResposta")
-                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Mensagem")
@@ -89,7 +88,7 @@ namespace ETrocas.Database.Migrations
                     b.Property<int>("StatusProposta")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("UsuarioId")
+                    b.Property<Guid>("UsuarioRecebedorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("UsuarioPropostaId")
@@ -104,7 +103,7 @@ namespace ETrocas.Database.Migrations
 
                     b.HasIndex("ProdutoOfertadoId");
 
-                    b.HasIndex("UsuarioId");
+                    b.HasIndex("UsuarioRecebedorId");
 
                     b.HasIndex("UsuarioPropostaId");
 
@@ -162,9 +161,11 @@ namespace ETrocas.Database.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ETrocas.Domain.Entities.Usuario", null)
+                    b.HasOne("ETrocas.Domain.Entities.Usuario", "UsuarioRecebedor")
                         .WithMany("PropostasRecebidas")
-                        .HasForeignKey("UsuarioId");
+                        .HasForeignKey("UsuarioRecebedorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("ETrocas.Domain.Entities.Usuario", "UsuarioProposta")
                         .WithMany("PropostasFeitas")
@@ -177,6 +178,8 @@ namespace ETrocas.Database.Migrations
                     b.Navigation("ProdutoOfertado");
 
                     b.Navigation("UsuarioProposta");
+
+                    b.Navigation("UsuarioRecebedor");
                 });
 
             modelBuilder.Entity("ETrocas.Domain.Entities.Usuario", b =>

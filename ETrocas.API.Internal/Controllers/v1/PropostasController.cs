@@ -2,18 +2,21 @@
 using ETrocas.Application.Interfaces;
 using ETrocas.Application.Requests;
 using ETrocas.Application.Responses;
+using ETrocas.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ETrocas.API.Internal.Controllers.v1
 {
     /// <summary>
-    /// Endpoints para criação de propostas de troca.
+    /// Endpoints de propostas de troca.
     /// </summary>
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("1.0")]
     [Produces("application/json")]
+    [Authorize]
     public class PropostasController : ControllerBase
     {
         private readonly IPropostaService _propostaService;
@@ -23,17 +26,6 @@ namespace ETrocas.API.Internal.Controllers.v1
             _propostaService = propostaService;
         }
 
-        /// <summary>
-        /// Cria uma proposta de troca para um produto desejado.
-        /// </summary>
-        /// <param name="id">Identificador do produto desejado (deve ser igual ao ProdutoDesejadoId do corpo).</param>
-        /// <param name="propostaRequest">Dados da proposta de troca.</param>
-        /// <returns>Proposta criada.</returns>
-        /// <response code="200">Proposta criada com sucesso.</response>
-        /// <response code="400">Dados da proposta inválidos.</response>
-        /// <response code="401">Usuário não autenticado.</response>
-        /// <response code="404">Produto não encontrado para proposta.</response>
-        [Authorize]
         [HttpPost("{id:guid}")]
         [ProducesResponseType(typeof(PropostaResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -46,8 +38,68 @@ namespace ETrocas.API.Internal.Controllers.v1
                 return BadRequest("O id da rota deve ser o mesmo ProdutoDesejadoId informado no corpo da requisição.");
             }
 
-            var proposta = await _propostaService.FazerPropostaAsync(propostaRequest);
+            if (!TryGetUsuarioId(out var usuarioId))
+            {
+                return Unauthorized();
+            }
+
+            var proposta = await _propostaService.FazerPropostaAsync(propostaRequest, usuarioId);
             return Ok(proposta);
+        }
+
+        [HttpGet("enviadas")]
+        [ProducesResponseType(typeof(IReadOnlyCollection<PropostaResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> ListarEnviadas()
+        {
+            if (!TryGetUsuarioId(out var usuarioId))
+            {
+                return Unauthorized();
+            }
+
+            var propostas = await _propostaService.ListarEnviadasAsync(usuarioId);
+            return Ok(propostas);
+        }
+
+        [HttpGet("recebidas")]
+        [ProducesResponseType(typeof(IReadOnlyCollection<PropostaResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> ListarRecebidas()
+        {
+            if (!TryGetUsuarioId(out var usuarioId))
+            {
+                return Unauthorized();
+            }
+
+            var propostas = await _propostaService.ListarRecebidasAsync(usuarioId);
+            return Ok(propostas);
+        }
+
+        [HttpPut("{id:guid}/status")]
+        [ProducesResponseType(typeof(PropostaResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> AtualizarStatus(Guid id, [FromBody] AtualizarStatusPropostaRequest request)
+        {
+            if (!TryGetUsuarioId(out var usuarioId))
+            {
+                return Unauthorized();
+            }
+
+            if (request.Status == EStatusProposta.Pendente)
+            {
+                return BadRequest("Não é permitido retornar uma proposta para o status Pendente.");
+            }
+
+            var proposta = await _propostaService.AtualizarStatusAsync(id, usuarioId, request.Status);
+            return Ok(proposta);
+        }
+
+        private bool TryGetUsuarioId(out Guid usuarioId)
+        {
+            usuarioId = Guid.Empty;
+            var usuarioClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return !string.IsNullOrWhiteSpace(usuarioClaim) && Guid.TryParse(usuarioClaim, out usuarioId);
         }
     }
 }
