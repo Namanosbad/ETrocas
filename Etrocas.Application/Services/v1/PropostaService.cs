@@ -26,7 +26,7 @@ namespace ETrocas.Application.Services.v1
 
         public async Task<PropostaResponse> FazerPropostaAsync(PropostaRequest propostaRequest)
         {
-            if (propostaRequest.ProdutoDesejadoId == propostaRequest.ProdutoOfertadoid)
+            if (propostaRequest.ProdutoDesejadoId == propostaRequest.ProdutoOfertadoId)
             {
                 throw new ArgumentException("O produto ofertado não pode ser o mesmo produto desejado.");
             }
@@ -34,7 +34,7 @@ namespace ETrocas.Application.Services.v1
             var produtoDesejado = await _produtoRepository.GetByIdAsync(propostaRequest.ProdutoDesejadoId)
                                  ?? throw new InvalidOperationException("Produto desejado não encontrado.");
 
-            var produtoOfertado = await _produtoRepository.GetByIdAsync(propostaRequest.ProdutoOfertadoid)
+            var produtoOfertado = await _produtoRepository.GetByIdAsync(propostaRequest.ProdutoOfertadoId)
                                  ?? throw new InvalidOperationException("Produto ofertado não encontrado.");
 
             if (produtoDesejado.UsuarioId == produtoOfertado.UsuarioId)

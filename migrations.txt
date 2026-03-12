@@ -4,3 +4,10 @@ dotnet ef database update --project ETrocas.Database --startup-project ETrocas.A
 
 dotnet ef migrations remove --project ETrocas.Database --startup-project ETrocas.Api.Internal
 
+docker stop etrocas-api
+ docker rm etrocas-api
+ docker run -d -p 8080:8080 --name etrocas-api `
+  --add-host=host.docker.internal:host-gateway `
+  -e ETROCAS_DB_CONNECTION_STRING="Server=host.docker.internal,1433;Database=ETrocasDb;User Id=sa;Password=StrongPass!123;TrustServerCertificate=True" `
+   -e ETROCAS_TOKEN_KEY="ETrocas-Dev-Only-Jwt-Key-Change-In-Production-2026!" `
+   etrocas-api

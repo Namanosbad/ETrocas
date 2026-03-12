@@ -14,7 +14,7 @@ namespace ETrocas.API.Internal.Controllers.v1
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("1.0")]
     [Produces("application/json")]
-    public class PropostasController : Controller
+    public class PropostasController : ControllerBase
     {
         private readonly IPropostaService _propostaService;
 

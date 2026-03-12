@@ -10,7 +10,7 @@ namespace ETrocas.Application.Mappings
         public PropostaMappingProfile()
         {
             CreateMap<PropostaRequest, Proposta>()
-                .ForMember(dest => dest.ProdutoOfertadoId, opt => opt.MapFrom(src => src.ProdutoOfertadoid));
+                .ForMember(dest => dest.ProdutoOfertadoId, opt => opt.MapFrom(src => src.ProdutoOfertadoId));
 
             CreateMap<Proposta, PropostaResponse>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.StatusProposta));
