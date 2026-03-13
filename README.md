@@ -11,7 +11,7 @@ O projeto foi construído com foco em boas práticas de desenvolvimento, separa�
 
 ### Swagger
 
-![Swagger](https://github.com/user-attachments/assets/b07c374e-a5e5-4bc3-a415-25c4564da43c)
+![Swagger](https://github.com/user-attachments/assets/52d368d9-e71c-40ae-a0f4-968eae327dab)
 
 ------------------------------------------------------------------------
 ## 🚀 Tecnologias Utilizadas
