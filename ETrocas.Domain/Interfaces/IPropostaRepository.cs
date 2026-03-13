@@ -10,4 +10,5 @@ public interface IPropostaRepository
     Task<IReadOnlyCollection<Proposta>> ListarEnviadasAsync(Guid usuarioId);
     Task<IReadOnlyCollection<Proposta>> ListarRecebidasAsync(Guid usuarioId);
     Task<Proposta> AtualizarStatusAsync(Proposta proposta, EStatusProposta status);
+    Task CancelarPendentesRelacionadasAsync(Guid propostaConcluidaId, Guid produtoDesejadoId, Guid produtoOfertadoId);
 }

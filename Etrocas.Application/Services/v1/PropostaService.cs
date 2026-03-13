@@ -111,6 +111,11 @@ namespace ETrocas.Application.Services.v1
             }
 
             var atualizada = await _propostaRepository.AtualizarStatusAsync(proposta, EStatusProposta.Concluida);
+            await _propostaRepository.CancelarPendentesRelacionadasAsync(
+                proposta.Id,
+                proposta.ProdutoDesejadoId,
+                proposta.ProdutoOfertadoId);
+
             return _mapper.Map<PropostaResponse>(atualizada);
         }
 
