@@ -14,16 +14,19 @@ namespace ETrocas.Application.Services.v1
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly ITokenService _tokenService;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IRepository<Usuario> _repository;
 
         //Injeção de dependencias.
         public UsuarioService(
             IUsuarioRepository usuarioRepository,
             ITokenService tokenService,
-            IPasswordHasher passwordHasher)
+            IPasswordHasher passwordHasher,
+            IRepository<Usuario> repository)
         {
             _usuarioRepository = usuarioRepository;
             _tokenService = tokenService;
             _passwordHasher = passwordHasher;
+            _repository = repository;
         }
 
         public async Task<RegistrarUsuarioResponse> RegistrarUsuarioAsync(RegistrarUsuarioRequest request)
@@ -85,6 +88,62 @@ namespace ETrocas.Application.Services.v1
                 Nome = usuario.Nome,
                 Email = usuario.Email,
                 Token = token
+            };
+        }
+
+        public async Task<IEnumerable<UsuarioResponse>> ListarUsuariosAsync()
+        {
+            var usuarios = await _repository.GetAllAsync();
+
+            return usuarios.Select(usuario => new UsuarioResponse
+            {
+                Id = usuario.Id,
+                Nome = usuario.Nome,
+                Email = usuario.Email,
+            });
+        }
+
+        public async Task<UsuarioResponse> ObterUsuarioPorIdAsync(Guid usuarioId)
+        {
+            var usuario = await _repository.GetByIdAsync(usuarioId);
+
+            if (usuario == null)
+                throw new InvalidOperationException("Usuário não encontrado.");
+
+            return new UsuarioResponse
+            {
+                Id = usuario.Id,
+                Nome = usuario.Nome,
+                Email = usuario.Email,
+            };
+        }
+
+        public async Task<UsuarioResponse> AtualizarUsuarioAsync(Guid usuarioId, AtualizarUsuarioRequest request)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            if (string.IsNullOrWhiteSpace(request.Nome) || string.IsNullOrWhiteSpace(request.Email))
+                throw new ArgumentException("Nome e email são obrigatórios.");
+
+            var usuario = await _repository.GetByIdAsync(usuarioId);
+            if (usuario == null)
+                throw new InvalidOperationException("Usuário não encontrado.");
+
+            var usuarioExistenteComMesmoEmail = await _usuarioRepository.ValidarEmailAsync(request.Email);
+            if (usuarioExistenteComMesmoEmail != null && usuarioExistenteComMesmoEmail.Id != usuarioId)
+                throw new ArgumentException("Email já cadastrado.");
+
+            usuario.Nome = request.Nome;
+            usuario.Email = request.Email;
+
+            await _repository.UpdateAsync(usuario);
+
+            return new UsuarioResponse
+            {
+                Id = usuario.Id,
+                Nome = usuario.Nome,
+                Email = usuario.Email,
             };
         }
     }
