@@ -17,17 +17,11 @@ namespace ETrocas.API.Internal.Controllers.v1
     [Produces("application/json")]
     public class UsuariosController : ControllerBase
     {
+        private const string LeituraUsuariosPolicy = "CanReadUsers";
         private readonly IUsuarioService _usuarioService;
 
         public UsuariosController(IUsuarioService usuarioService) => _usuarioService = usuarioService;
 
-        /// <summary>
-        /// Registra um novo usuário.
-        /// </summary>
-        /// <param name="request">Dados necessários para cadastro.</param>
-        /// <returns>Dados do usuário cadastrado.</returns>
-        /// <response code="200">Usuário cadastrado com sucesso.</response>
-        /// <response code="400">Dados inválidos para cadastro.</response>
         [HttpPost]
         [ProducesResponseType(typeof(RegistrarUsuarioResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -37,41 +31,27 @@ namespace ETrocas.API.Internal.Controllers.v1
             return Ok(response);
         }
 
-        /// <summary>
-        /// Lista todos os usuários cadastrados.
-        /// </summary>
-        /// <returns>Lista de usuários.</returns>
-        /// <response code="200">Usuários retornados com sucesso.</response>
+        [Authorize(Policy = LeituraUsuariosPolicy)]
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<UsuarioResponse>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> ListarUsuarios()
+        [ProducesResponseType(typeof(UsuariosPaginadosResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> ListarUsuarios([FromQuery] int pagina = 1, [FromQuery] int tamanhoPagina = 20)
         {
-            var response = await _usuarioService.ListarUsuariosAsync();
+            var response = await _usuarioService.ListarUsuariosAsync(pagina, tamanhoPagina);
             return Ok(response);
         }
 
-        /// <summary>
-        /// Busca um usuário por identificador.
-        /// </summary>
-        /// <param name="id">Identificador do usuário.</param>
-        /// <returns>Dados básicos do usuário.</returns>
-        /// <response code="200">Usuário encontrado.</response>
-        /// <response code="404">Usuário não encontrado.</response>
+        [Authorize(Policy = LeituraUsuariosPolicy)]
         [HttpGet("{id:guid}")]
-        [ProducesResponseType(typeof(UsuarioResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(UsuarioPublicoResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> ObterUsuarioPorId(Guid id)
         {
             var response = await _usuarioService.ObterUsuarioPorIdAsync(id);
             return Ok(response);
         }
 
-        /// <summary>
-        /// Retorna os dados do usuário autenticado.
-        /// </summary>
-        /// <returns>Dados do perfil autenticado.</returns>
-        /// <response code="200">Perfil retornado com sucesso.</response>
-        /// <response code="401">Usuário não autenticado.</response>
         [Authorize]
         [HttpGet("me")]
         [ProducesResponseType(typeof(UsuarioResponse), StatusCodes.Status200OK)]
@@ -83,19 +63,10 @@ namespace ETrocas.API.Internal.Controllers.v1
             if (string.IsNullOrWhiteSpace(usuarioId) || !Guid.TryParse(usuarioId, out var usuarioGuid))
                 return Unauthorized();
 
-            var response = await _usuarioService.ObterUsuarioPorIdAsync(usuarioGuid);
+            var response = await _usuarioService.ObterPerfilUsuarioAsync(usuarioGuid);
             return Ok(response);
         }
 
-        /// <summary>
-        /// Atualiza o perfil do usuário autenticado.
-        /// </summary>
-        /// <param name="request">Dados atualizados de perfil.</param>
-        /// <returns>Dados do usuário atualizados.</returns>
-        /// <response code="200">Perfil atualizado com sucesso.</response>
-        /// <response code="400">Dados inválidos.</response>
-        /// <response code="401">Usuário não autenticado.</response>
-        /// <response code="404">Usuário não encontrado.</response>
         [Authorize]
         [HttpPut("me")]
         [ProducesResponseType(typeof(UsuarioResponse), StatusCodes.Status200OK)]

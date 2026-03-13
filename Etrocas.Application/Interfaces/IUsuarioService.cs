@@ -7,7 +7,8 @@ public interface IUsuarioService
 {
     Task<RegistrarUsuarioResponse> RegistrarUsuarioAsync(RegistrarUsuarioRequest request);
     Task<LoginUsuarioResponse> LoginUsuarioAsync(LoginUsuarioRequest request);
-    Task<IEnumerable<UsuarioResponse>> ListarUsuariosAsync();
-    Task<UsuarioResponse> ObterUsuarioPorIdAsync(Guid usuarioId);
+    Task<UsuariosPaginadosResponse> ListarUsuariosAsync(int pagina, int tamanhoPagina);
+    Task<UsuarioPublicoResponse> ObterUsuarioPorIdAsync(Guid usuarioId);
+    Task<UsuarioResponse> ObterPerfilUsuarioAsync(Guid usuarioId);
     Task<UsuarioResponse> AtualizarUsuarioAsync(Guid usuarioId, AtualizarUsuarioRequest request);
 }
