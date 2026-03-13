@@ -2,6 +2,7 @@
 using ETrocas.Domain.Enums;
 using ETrocas.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ETrocas.Database.Repository
 {
@@ -51,5 +52,47 @@ namespace ETrocas.Database.Repository
             await _eTrocasDbContext.SaveChangesAsync();
             return proposta;
         }
+
+
+        public async Task<Proposta> ConcluirComCancelamentoAtomicoAsync(Proposta proposta)
+        {
+            await using IDbContextTransaction transaction = await _eTrocasDbContext.Database.BeginTransactionAsync();
+            try
+            {
+                proposta.StatusProposta = EStatusProposta.Concluida;
+                proposta.DataResposta = DateTime.UtcNow;
+                _eTrocasDbContext.Propostas.Update(proposta);
+
+                var propostasPendentesRelacionadas = await _eTrocasDbContext.Propostas
+                    .Where(p => p.Id != proposta.Id
+                                && p.StatusProposta == EStatusProposta.Pendente
+                                && (p.ProdutoDesejadoId == proposta.ProdutoDesejadoId
+                                    || p.ProdutoDesejadoId == proposta.ProdutoOfertadoId
+                                    || p.ProdutoOfertadoId == proposta.ProdutoDesejadoId
+                                    || p.ProdutoOfertadoId == proposta.ProdutoOfertadoId))
+                    .ToListAsync();
+
+                foreach (var pendente in propostasPendentesRelacionadas)
+                {
+                    pendente.StatusProposta = EStatusProposta.Cancelada;
+                    pendente.DataResposta = DateTime.UtcNow;
+                }
+
+                if (propostasPendentesRelacionadas.Count > 0)
+                    _eTrocasDbContext.Propostas.UpdateRange(propostasPendentesRelacionadas);
+
+                await _eTrocasDbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return proposta;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+
     }
 }
