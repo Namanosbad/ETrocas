@@ -110,12 +110,7 @@ namespace ETrocas.Application.Services.v1
                 throw new InvalidOperationException("Somente propostas aceitas podem ser concluídas.");
             }
 
-            var atualizada = await _propostaRepository.AtualizarStatusAsync(proposta, EStatusProposta.Concluida);
-            await _propostaRepository.CancelarPendentesRelacionadasAsync(
-                proposta.Id,
-                proposta.ProdutoDesejadoId,
-                proposta.ProdutoOfertadoId);
-
+            var atualizada = await _propostaRepository.ConcluirComCancelamentoAtomicoAsync(proposta);
             return _mapper.Map<PropostaResponse>(atualizada);
         }
 

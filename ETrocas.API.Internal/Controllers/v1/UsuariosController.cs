@@ -46,10 +46,12 @@ namespace ETrocas.API.Internal.Controllers.v1
         /// <returns>Conjunto paginado de usuários públicos.</returns>
         /// <response code="200">Usuários retornados com sucesso.</response>
         /// <response code="401">Usuário não autenticado.</response>
+        /// <response code="403">Usuário autenticado sem permissão para leitura.</response>
         [Authorize(Policy = LeituraUsuariosPolicy)]
         [HttpGet]
         [ProducesResponseType(typeof(UsuariosPaginadosResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> ListarUsuarios([FromQuery] int pagina = 1, [FromQuery] int tamanhoPagina = 20)
         {
             var response = await _usuarioService.ListarUsuariosAsync(pagina, tamanhoPagina);
@@ -63,12 +65,14 @@ namespace ETrocas.API.Internal.Controllers.v1
         /// <returns>Dados públicos do usuário.</returns>
         /// <response code="200">Usuário encontrado.</response>
         /// <response code="401">Usuário não autenticado.</response>
+        /// <response code="403">Usuário autenticado sem permissão para leitura.</response>
         /// <response code="404">Usuário não encontrado.</response>
         [Authorize(Policy = LeituraUsuariosPolicy)]
         [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(UsuarioPublicoResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> ObterUsuarioPorId(Guid id)
         {
             var response = await _usuarioService.ObterUsuarioPorIdAsync(id);
