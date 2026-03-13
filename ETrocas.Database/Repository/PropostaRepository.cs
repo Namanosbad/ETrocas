@@ -51,5 +51,29 @@ namespace ETrocas.Database.Repository
             await _eTrocasDbContext.SaveChangesAsync();
             return proposta;
         }
+
+        public async Task CancelarPendentesRelacionadasAsync(Guid propostaConcluidaId, Guid produtoDesejadoId, Guid produtoOfertadoId)
+        {
+            var propostasPendentesRelacionadas = await _eTrocasDbContext.Propostas
+                .Where(p => p.Id != propostaConcluidaId
+                            && p.StatusProposta == EStatusProposta.Pendente
+                            && (p.ProdutoDesejadoId == produtoDesejadoId
+                                || p.ProdutoDesejadoId == produtoOfertadoId
+                                || p.ProdutoOfertadoId == produtoDesejadoId
+                                || p.ProdutoOfertadoId == produtoOfertadoId))
+                .ToListAsync();
+
+            if (propostasPendentesRelacionadas.Count == 0)
+                return;
+
+            foreach (var proposta in propostasPendentesRelacionadas)
+            {
+                proposta.StatusProposta = EStatusProposta.Cancelada;
+                proposta.DataResposta = DateTime.UtcNow;
+            }
+
+            _eTrocasDbContext.Propostas.UpdateRange(propostasPendentesRelacionadas);
+            await _eTrocasDbContext.SaveChangesAsync();
+        }
     }
 }

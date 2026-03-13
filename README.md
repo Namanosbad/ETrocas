@@ -100,18 +100,25 @@ A API estará disponível conforme as URLs definidas em:
 
 ## 📌 Endpoints atuais (v1)
 
-### Usuário (`CadastrarUsuarioController`)
+### Auth (`AuthController`)
 
-- `POST /api/v1/CadastrarUsuario/registrar`
-- `POST /api/v1/CadastrarUsuario/login`
+- `POST /api/v1/Auth/login`
+
+### Usuários (`UsuariosController`)
+
+- `POST /api/v1/Usuarios`
+- `GET /api/v1/Usuarios?pagina=1&tamanhoPagina=20` (autenticado + policy `CanReadUsers`)
+- `GET /api/v1/Usuarios/{id}` (autenticado + policy `CanReadUsers`)
+- `GET /api/v1/Usuarios/me` (autenticado)
+- `PUT /api/v1/Usuarios/me` (autenticado)
 
 ### Produtos (`ProdutosController`)
 
-- `POST /api/v1/Produtos/CadastrarProduto` (autenticado)
-- `GET /api/v1/Produtos/BuscarTodosProdutos`
-- `GET /api/v1/Produtos/BuscarProduto/{id}` (autenticado)
-- `PUT /api/v1/Produtos/AtualizarProduto/{id}` (autenticado)
-- `DELETE /api/v1/Produtos/DeletarProduto/{id}` (autenticado)
+- `POST /api/v1/Produtos` (autenticado)
+- `GET /api/v1/Produtos`
+- `GET /api/v1/Produtos/{id}` (autenticado)
+- `PUT /api/v1/Produtos/{id}` (autenticado)
+- `DELETE /api/v1/Produtos/{id}` (autenticado)
 
 ### Propostas (`PropostasController`)
 
