@@ -25,6 +25,16 @@ namespace ETrocas.API.Internal.Controllers.v1
             _propostaService = propostaService;
         }
 
+        /// <summary>
+        /// Cria uma nova proposta de troca para um produto desejado.
+        /// </summary>
+        /// <param name="id">Identificador do produto desejado informado na rota.</param>
+        /// <param name="propostaRequest">Dados da proposta (produto ofertado, valor e mensagem).</param>
+        /// <returns>Proposta criada com status inicial pendente.</returns>
+        /// <response code="200">Proposta criada com sucesso.</response>
+        /// <response code="400">Dados inválidos para criação da proposta.</response>
+        /// <response code="401">Usuário não autenticado.</response>
+        /// <response code="404">Produto desejado ou ofertado não encontrado.</response>
         [HttpPost("{id:guid}")]
         [ProducesResponseType(typeof(PropostaResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -46,6 +56,12 @@ namespace ETrocas.API.Internal.Controllers.v1
             return Ok(proposta);
         }
 
+        /// <summary>
+        /// Lista as propostas enviadas pelo usuário autenticado.
+        /// </summary>
+        /// <returns>Coleção de propostas enviadas.</returns>
+        /// <response code="200">Propostas enviadas retornadas com sucesso.</response>
+        /// <response code="401">Usuário não autenticado.</response>
         [HttpGet("enviadas")]
         [ProducesResponseType(typeof(IReadOnlyCollection<PropostaResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -60,6 +76,12 @@ namespace ETrocas.API.Internal.Controllers.v1
             return Ok(propostas);
         }
 
+        /// <summary>
+        /// Lista as propostas recebidas pelo usuário autenticado.
+        /// </summary>
+        /// <returns>Coleção de propostas recebidas.</returns>
+        /// <response code="200">Propostas recebidas retornadas com sucesso.</response>
+        /// <response code="401">Usuário não autenticado.</response>
         [HttpGet("recebidas")]
         [ProducesResponseType(typeof(IReadOnlyCollection<PropostaResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -74,6 +96,13 @@ namespace ETrocas.API.Internal.Controllers.v1
             return Ok(propostas);
         }
 
+        /// <summary>
+        /// Aceita uma proposta pendente recebida pelo usuário autenticado.
+        /// </summary>
+        /// <param name="id">Identificador da proposta.</param>
+        /// <returns>Proposta atualizada com status aceito.</returns>
+        /// <response code="200">Proposta aceita com sucesso.</response>
+        /// <response code="401">Usuário não autenticado.</response>
         [HttpPut("{id:guid}/aceitar")]
         [ProducesResponseType(typeof(PropostaResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -87,6 +116,13 @@ namespace ETrocas.API.Internal.Controllers.v1
             return Ok(await _propostaService.AceitarAsync(id, usuarioId));
         }
 
+        /// <summary>
+        /// Recusa uma proposta pendente recebida pelo usuário autenticado.
+        /// </summary>
+        /// <param name="id">Identificador da proposta.</param>
+        /// <returns>Proposta atualizada com status recusado.</returns>
+        /// <response code="200">Proposta recusada com sucesso.</response>
+        /// <response code="401">Usuário não autenticado.</response>
         [HttpPut("{id:guid}/recusar")]
         [ProducesResponseType(typeof(PropostaResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -100,6 +136,13 @@ namespace ETrocas.API.Internal.Controllers.v1
             return Ok(await _propostaService.RecusarAsync(id, usuarioId));
         }
 
+        /// <summary>
+        /// Cancela uma proposta pendente enviada pelo usuário autenticado.
+        /// </summary>
+        /// <param name="id">Identificador da proposta.</param>
+        /// <returns>Proposta atualizada com status cancelado.</returns>
+        /// <response code="200">Proposta cancelada com sucesso.</response>
+        /// <response code="401">Usuário não autenticado.</response>
         [HttpPut("{id:guid}/cancelar")]
         [ProducesResponseType(typeof(PropostaResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -113,6 +156,13 @@ namespace ETrocas.API.Internal.Controllers.v1
             return Ok(await _propostaService.CancelarAsync(id, usuarioId));
         }
 
+        /// <summary>
+        /// Conclui uma proposta aceita entre os participantes da troca.
+        /// </summary>
+        /// <param name="id">Identificador da proposta.</param>
+        /// <returns>Proposta atualizada com status concluído.</returns>
+        /// <response code="200">Proposta concluída com sucesso.</response>
+        /// <response code="401">Usuário não autenticado.</response>
         [HttpPut("{id:guid}/concluir")]
         [ProducesResponseType(typeof(PropostaResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

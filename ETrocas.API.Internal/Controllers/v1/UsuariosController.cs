@@ -22,6 +22,13 @@ namespace ETrocas.API.Internal.Controllers.v1
 
         public UsuariosController(IUsuarioService usuarioService) => _usuarioService = usuarioService;
 
+        /// <summary>
+        /// Registra um novo usuário na plataforma.
+        /// </summary>
+        /// <param name="request">Dados de cadastro do usuário.</param>
+        /// <returns>Informações básicas do usuário criado e token de autenticação.</returns>
+        /// <response code="200">Usuário cadastrado com sucesso.</response>
+        /// <response code="400">Dados inválidos para cadastro.</response>
         [HttpPost]
         [ProducesResponseType(typeof(RegistrarUsuarioResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -31,6 +38,14 @@ namespace ETrocas.API.Internal.Controllers.v1
             return Ok(response);
         }
 
+        /// <summary>
+        /// Lista usuários com paginação e projeção pública mínima.
+        /// </summary>
+        /// <param name="pagina">Número da página (inicia em 1).</param>
+        /// <param name="tamanhoPagina">Quantidade de registros por página.</param>
+        /// <returns>Conjunto paginado de usuários públicos.</returns>
+        /// <response code="200">Usuários retornados com sucesso.</response>
+        /// <response code="401">Usuário não autenticado.</response>
         [Authorize(Policy = LeituraUsuariosPolicy)]
         [HttpGet]
         [ProducesResponseType(typeof(UsuariosPaginadosResponse), StatusCodes.Status200OK)]
@@ -41,6 +56,14 @@ namespace ETrocas.API.Internal.Controllers.v1
             return Ok(response);
         }
 
+        /// <summary>
+        /// Obtém os dados públicos de um usuário pelo identificador.
+        /// </summary>
+        /// <param name="id">Identificador do usuário.</param>
+        /// <returns>Dados públicos do usuário.</returns>
+        /// <response code="200">Usuário encontrado.</response>
+        /// <response code="401">Usuário não autenticado.</response>
+        /// <response code="404">Usuário não encontrado.</response>
         [Authorize(Policy = LeituraUsuariosPolicy)]
         [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(UsuarioPublicoResponse), StatusCodes.Status200OK)]
@@ -52,6 +75,12 @@ namespace ETrocas.API.Internal.Controllers.v1
             return Ok(response);
         }
 
+        /// <summary>
+        /// Retorna os dados completos do usuário autenticado.
+        /// </summary>
+        /// <returns>Perfil do usuário autenticado.</returns>
+        /// <response code="200">Perfil retornado com sucesso.</response>
+        /// <response code="401">Usuário não autenticado.</response>
         [Authorize]
         [HttpGet("me")]
         [ProducesResponseType(typeof(UsuarioResponse), StatusCodes.Status200OK)]
@@ -67,6 +96,15 @@ namespace ETrocas.API.Internal.Controllers.v1
             return Ok(response);
         }
 
+        /// <summary>
+        /// Atualiza os dados de perfil do usuário autenticado.
+        /// </summary>
+        /// <param name="request">Dados atualizados de perfil.</param>
+        /// <returns>Perfil atualizado do usuário autenticado.</returns>
+        /// <response code="200">Perfil atualizado com sucesso.</response>
+        /// <response code="400">Dados inválidos para atualização.</response>
+        /// <response code="401">Usuário não autenticado.</response>
+        /// <response code="404">Usuário não encontrado.</response>
         [Authorize]
         [HttpPut("me")]
         [ProducesResponseType(typeof(UsuarioResponse), StatusCodes.Status200OK)]
