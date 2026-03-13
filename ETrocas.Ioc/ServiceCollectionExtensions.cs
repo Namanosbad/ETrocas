@@ -17,6 +17,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
 using System.Text;
+using System.Security.Claims;
 
 namespace ETrocas.Ioc
 {
@@ -28,6 +29,7 @@ namespace ETrocas.Ioc
             services.AddDbContext(configuration);
             services.AddCorsPolicy(configuration);
             services.AddAuthentication(configuration);
+            services.AddAuthorizationPolicies();
             services.AddApplicationServices();
             services.AddAutoMapper(typeof(PropostaMappingProfile).Assembly);
             services.AddApiVersioning(configuration);
@@ -119,6 +121,21 @@ namespace ETrocas.Ioc
 
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<IPasswordHasher, PasswordHasher>();
+
+            return services;
+        }
+
+
+        private static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services)
+        {
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("CanReadUsers", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim(ClaimTypes.NameIdentifier);
+                });
+            });
 
             return services;
         }

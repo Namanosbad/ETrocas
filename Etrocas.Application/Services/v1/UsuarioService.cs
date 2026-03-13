@@ -5,25 +5,25 @@ using ETrocas.Domain.Entities;
 using ETrocas.Domain.Interfaces;
 using ETrocas.Shared.Interfaces;
 
-//Service contém as regras de negócio, Serve como ponte entre o controller e o repositório
 namespace ETrocas.Application.Services.v1
 {
     public class UsuarioService : IUsuarioService
     {
-        //Injeção de dependencias.
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly ITokenService _tokenService;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IRepository<Usuario> _repository;
 
-        //Injeção de dependencias.
         public UsuarioService(
             IUsuarioRepository usuarioRepository,
             ITokenService tokenService,
-            IPasswordHasher passwordHasher)
+            IPasswordHasher passwordHasher,
+            IRepository<Usuario> repository)
         {
             _usuarioRepository = usuarioRepository;
             _tokenService = tokenService;
             _passwordHasher = passwordHasher;
+            _repository = repository;
         }
 
         public async Task<RegistrarUsuarioResponse> RegistrarUsuarioAsync(RegistrarUsuarioRequest request)
@@ -40,8 +40,7 @@ namespace ETrocas.Application.Services.v1
             if (usuarioExistente != null)
                 throw new ArgumentException("Email já cadastrado.");
 
-            //cria um novo objeto Usuario. Esse objeto representa um novo usuário que será registrado no sistema.
-            var CadastroUsuario = new Usuario
+            var cadastroUsuario = new Usuario
             {
                 Id = Guid.NewGuid(),
                 Nome = request.Nome,
@@ -49,11 +48,9 @@ namespace ETrocas.Application.Services.v1
                 SenhaHash = _passwordHasher.Hash(request.SenhaHash),
             };
 
-            //aqui grava no banco conforme o repository está feito.
-            var usuarioCriado = await _usuarioRepository.RegistrarUsuarioAsync(CadastroUsuario);
+            var usuarioCriado = await _usuarioRepository.RegistrarUsuarioAsync(cadastroUsuario);
 
             var token = _tokenService.Gerar(usuarioCriado);
-            //o que vai retornar para o usuario.
             return new RegistrarUsuarioResponse
             {
                 Id = usuarioCriado.Id,
@@ -71,20 +68,106 @@ namespace ETrocas.Application.Services.v1
             if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.SenhaHash))
                 throw new ArgumentException("Email e senha são obrigatórios.");
 
-            //criando o novo objeto. Esse objeto representa o usuario que vai logar no sistema
             var usuario = await _usuarioRepository.ObterPorEmailAsync(request.Email);
 
             if (usuario == null || !_passwordHasher.Verify(request.SenhaHash, usuario.SenhaHash ?? string.Empty))
                 throw new UnauthorizedAccessException("Credenciais inválidas.");
 
             var token = _tokenService.Gerar(usuario);
-            //o que aparece pro cliente/quem usar 
             return new LoginUsuarioResponse
             {
                 Id = usuario.Id,
                 Nome = usuario.Nome,
                 Email = usuario.Email,
                 Token = token
+            };
+        }
+
+        public async Task<UsuariosPaginadosResponse> ListarUsuariosAsync(int pagina, int tamanhoPagina)
+        {
+            if (pagina <= 0)
+                throw new ArgumentException("Página deve ser maior que zero.");
+
+            if (tamanhoPagina <= 0 || tamanhoPagina > 100)
+                throw new ArgumentException("Tamanho da página deve estar entre 1 e 100.");
+
+            var usuarios = (await _repository.GetAllAsync()).ToList();
+
+            var itens = usuarios
+                .OrderBy(usuario => usuario.Nome)
+                .Skip((pagina - 1) * tamanhoPagina)
+                .Take(tamanhoPagina)
+                .Select(usuario => new UsuarioPublicoResponse
+                {
+                    Id = usuario.Id,
+                    Nome = usuario.Nome,
+                })
+                .ToList();
+
+            return new UsuariosPaginadosResponse
+            {
+                Pagina = pagina,
+                TamanhoPagina = tamanhoPagina,
+                TotalItens = usuarios.Count,
+                Itens = itens,
+            };
+        }
+
+        public async Task<UsuarioPublicoResponse> ObterUsuarioPorIdAsync(Guid usuarioId)
+        {
+            var usuario = await _repository.GetByIdAsync(usuarioId);
+
+            if (usuario == null)
+                throw new InvalidOperationException("Usuário não encontrado.");
+
+            return new UsuarioPublicoResponse
+            {
+                Id = usuario.Id,
+                Nome = usuario.Nome,
+            };
+        }
+
+        public async Task<UsuarioResponse> ObterPerfilUsuarioAsync(Guid usuarioId)
+        {
+            var usuario = await _repository.GetByIdAsync(usuarioId);
+
+            if (usuario == null)
+                throw new InvalidOperationException("Usuário não encontrado.");
+
+            return new UsuarioResponse
+            {
+                Id = usuario.Id,
+                Nome = usuario.Nome,
+                Email = usuario.Email,
+            };
+        }
+
+        public async Task<UsuarioResponse> AtualizarUsuarioAsync(Guid usuarioId, AtualizarUsuarioRequest request)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            if (string.IsNullOrWhiteSpace(request.Nome) || string.IsNullOrWhiteSpace(request.Email))
+                throw new ArgumentException("Nome e email são obrigatórios.");
+
+            var usuario = await _repository.GetByIdAsync(usuarioId);
+            if (usuario == null)
+                throw new InvalidOperationException("Usuário não encontrado.");
+
+            var usuarioExistenteComMesmoEmail = await _usuarioRepository.ValidarEmailAsync(request.Email);
+            if (usuarioExistenteComMesmoEmail != null && usuarioExistenteComMesmoEmail.Id != usuarioId)
+                throw new ArgumentException("Email já cadastrado.");
+
+            usuario.Nome = request.Nome;
+            usuario.Email = request.Email;
+
+            await _repository.UpdateAsync(usuario);
+
+            return new UsuarioResponse
+            {
+                Id = usuario.Id,
+                Nome = usuario.Nome,
+                Email = usuario.Email,
             };
         }
     }

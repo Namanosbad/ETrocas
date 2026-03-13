@@ -47,6 +47,7 @@ public static class ApiExceptionMiddlewareExtensions
                 ArgumentException => (StatusCodes.Status400BadRequest, "Requisição inválida"),
                 UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Não autorizado"),
                 InvalidOperationException => (StatusCodes.Status404NotFound, "Recurso não encontrado"),
+                KeyNotFoundException => (StatusCodes.Status404NotFound, "Recurso não encontrado"),
                 _ => (StatusCodes.Status500InternalServerError, "Erro interno do servidor")
             };
 
